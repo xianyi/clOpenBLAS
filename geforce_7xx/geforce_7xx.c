@@ -51,7 +51,7 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 static char  *DEFAULT_KERNEL = "geforce_7xx";
 
-static char  *DEFAULT_DEVICE = "geforce_gts_7";
+static char  *DEFAULT_DEVICE = "geforce_gtx_7";
 
 static struct gpu_context gpu;
 static int have_gpu_context = 0;

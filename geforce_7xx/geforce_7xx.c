@@ -752,7 +752,7 @@ static void open_gpu() {
 
 	#ifdef PROFILE
 		printf("----------------------------------------------------------------------------------\n");
-		printf("BEGIN geforce_4xx constructor\n");
+		printf("BEGIN geforce_7xx constructor\n");
 	#endif
 
 	memset(&gpu, 0, sizeof(struct gpu_context));
@@ -776,7 +776,7 @@ static void open_gpu() {
        		gettimeofday(&tv,NULL);
        		end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 		time=end-start;
-		printf("END geforce_4xx constructor\n");
+		printf("END geforce_7xx constructor\n");
 		printf("OpenCL create context summary:\t\t%f sec\n", time);
 	#endif
 
@@ -795,7 +795,7 @@ static void close_gpu() {
 
 	#ifdef PROFILE
 		printf("----------------------------------------------------------------------------------\n");
-		printf("BEGIN geforce_4xx destructor\n");
+		printf("BEGIN geforce_7xx destructor\n");
 		gettimeofday(&tv,NULL);
        		start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	#endif
@@ -808,7 +808,7 @@ static void close_gpu() {
        		end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 		time=end-start;
 		printf("OpenCL destroy all:\t\t\t%f sec\n", time);
-		printf("END geforce_4xx destructor\n");
+		printf("END geforce_7xx destructor\n");
 	#endif
 
 

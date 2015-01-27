@@ -5,6 +5,11 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_nodev.so
 
+test: test-sgemm-nodev
+
+install:
+	install libopenblas*.so ../lib
+
 nodev.o: nodev.c
 	gcc $(CFLAGS) -fPIC -c $(PFLAG) -I$(TOPDIR) -o nodev.o nodev.c
 

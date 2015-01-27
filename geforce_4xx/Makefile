@@ -8,6 +8,12 @@ All: libopenblas_geforce_4xx.so
 
 test: test-sgemm-geforce_4xx
 
+install:
+	install libopenblas*.so ../lib
+	install *.cl ../libcl
+
+
+
 geforce_4xx.o: geforce_4xx.c geforce_4xx.h sgemm.c
 	$(CC) $(CFLAGS) -fPIC -c $(PFLAG) -I../include -I$(TOPDIR)   -o geforce_4xx.o geforce_4xx.c
 

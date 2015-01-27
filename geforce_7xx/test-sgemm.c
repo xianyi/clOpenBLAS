@@ -21,9 +21,9 @@ int main (int argc, char *argv[])
 
 	int lda,ldb;
 
-	int m=128*128;	
-	int n=128*32;
-	int k=128*32;	
+	int m=8000*2;	
+	int n=8000*2;
+	int k=8000*2;	
 
 	char transa='N';
 	char transb='T';
@@ -33,19 +33,19 @@ int main (int argc, char *argv[])
 	else
 		lda = k;
 
-	if ( transb == 'N' )
-		ldb = k;
-	else
+	if ( transb == 'T' )
 		ldb = n;
+	else
+		ldb = k;
 
 	int ldc = m;
 
 
-
 	unsigned long i,j;
 
-	float alpha=2.0;
-	float beta=2.0;
+	float alpha=1.0;
+	float beta=1.0;
+	float error;
 
 	void *a1,*b1,*c1,*c2;
 	float *a,*b,*cg,*cc;
@@ -61,14 +61,13 @@ int main (int argc, char *argv[])
 	cc=(float *) c2;
 
 	// memset(a,0,2*4096*4096*4);
-	// #pragma omp parallel for
 	for( i = 0; i<m; i++)
 	{
 		for ( j = 0; j< k ; j++)
 		{
-				*a = (((float) rand() / (float) RAND_MAX) - 0.5) * 1e-1 ;
-				//*a = (float) (i+k+1) ;
-				// *a = (float) 1.0;
+				// *a = (((float) rand() / (float) RAND_MAX) - 0.5) * 1e-1 ;
+				// *a = (float) (10*i+k+1) ;
+				*a = (float) 1.0;
 				a++;
 		}	
 /*
@@ -95,8 +94,8 @@ int main (int argc, char *argv[])
 	{
 		for( j=0; j<n; j++)
 		{
-			*b = (((float) rand() / (float) RAND_MAX) - 0.5) * 1e-1;
-			// *b = (float) (0+1) ;
+			//*b = (((float) rand() / (float) RAND_MAX) - 0.5) * 1e-1;
+			*b = (float) (0+1) ;
 			//*b = (float) (i+k+1) ;
 			b++;
 		}
@@ -134,10 +133,17 @@ int main (int argc, char *argv[])
 	int ret=0;
 	int (*sgemm_gpu)();
 
+
 	sgemm_gpu = blas_gpu_info(3, "sgemm", NULL, NULL, NULL);
 	if ( sgemm_gpu )
 	{
 		ret = sgemm_gpu(&transa,&transb,&m,&n,&k,&alpha,a,&lda,b,&ldb,&beta,cg,&ldc);
+	}
+	else
+	{
+		printf("GPU error\n");
+                return(1);
+
 	}
 	if ( ret != 0)
 	{
@@ -159,14 +165,14 @@ int main (int argc, char *argv[])
 	end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	timec=end-start;
 
-/*
+
 	for(i=0; i<m*n; i++)
 	{
 		error = fabs((cc[i] - cg[i]));
 		if ( error > 0.1e-4 )
-			printf("ERROR: %d:%.16f	%.16f	%.16f\n",i,error, cg[i],cc[i]);
+			printf("ERROR: %ld:%.16f	%.16f	%.16f\n",i,error, cg[i],cc[i]);
 	}
-*/
+
 
 	double fp =(2.0 * (double) m*n*k  ) * (double) 1.0e-9;
 	double gflops=fp / timeg ;

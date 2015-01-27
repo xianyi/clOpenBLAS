@@ -14,7 +14,7 @@ int main (int argc, char *argv[])
 {
 
 	struct timeval tv;
-	double start,end,timec,timeg;
+	double start,end,timec;
 
 	int lda,ldb;
 
@@ -37,14 +37,10 @@ int main (int argc, char *argv[])
 
 	int ldc = m;
 
-	int one = 1;
-
-
 	unsigned long i,j;
 
 	float alpha=2.0;
 	float beta=2.0;
-	float error;
 
 	void *a1,*b1,*c1,*c2;
 	float *a,*b,*cg,*cc;
@@ -59,9 +55,6 @@ int main (int argc, char *argv[])
 	cg=(float *) c1;
 	cc=(float *) c2;
 
-	// memset(a,0,2*4096*4096*4);
-	int k1;
-	// #pragma omp parallel for
 	for( i = 0; i<m; i++)
 	{
 		for ( j = 0; j< k ; j++)
@@ -71,26 +64,7 @@ int main (int argc, char *argv[])
 				// *a = (float) 1.0;
 				a++;
 		}	
-/*
-		for ( j=k ; j<16; j++ )
-		{
-			*a = (float) 0.0;
-			a++;
-		}
-*/		
 	}			
-/*
-	for ( i=m ; i<128; i++ )
-	{
-		for ( j=0; j<16; j++)
-		{
-			*a = (float) 0.0;
-			a++;
-		}
-	}	
-*/
-	// memset(b,0,2*4096*4096*4);
-	// #pragma omp parallel for
 	for( i = 0; i<k; i++)
 	{
 		for( j=0; j<n; j++)
@@ -100,16 +74,8 @@ int main (int argc, char *argv[])
 			//*b = (float) (i+k+1) ;
 			b++;
 		}
-/*
-		for ( j=n ; j<64; j++ )
-		{
-			*b = (float) 0.0;
-			b++;
-		}
-*/
 	}			
 
-	// #pragma omp parallel for
 	for( i = 0; i<n; i++)
 	{
 		for(j=0; j<m; j++)
@@ -128,28 +94,16 @@ int main (int argc, char *argv[])
 	cg=(float *) c1;
 	cc=(float *) c2;
 
-	int ret=0;
-
-
-
 
 	gettimeofday(&tv,NULL);
 	start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 
-	sgemm_(&transa, &transb, &m, &n,&k ,&alpha, a, &lda, b, &ldb, &beta, cc, &m);
+	sgemm_(&transa, &transb, &m, &n,&k ,&alpha, a, &lda, b, &ldb, &beta, cc, &ldc);
 
 	gettimeofday(&tv,NULL);
 	end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	timec=end-start;
 
-/*
-	for(i=0; i<m*n; i++)
-	{
-		error = fabs((cc[i] - cg[i]));
-		if ( error > 0.1e-4 )
-			printf("ERROR: %d:%.16f	%.16f	%.16f\n",i,error, cg[i],cc[i]);
-	}
-*/
 
 	double fp =(2.0 * (double) m*n*k  ) * (double) 1.0e-9;
 	double gflops=fp / timec ;

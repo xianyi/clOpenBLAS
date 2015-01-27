@@ -21,12 +21,12 @@ int main (int argc, char *argv[])
 
 	int lda,ldb;
 
-	int m=3840*2;	
-	int n=3840;
-	int k=3840;	
+	int m=3840*4;	
+	int n=3840*2;
+	int k=3840*2;	
 
 	char transa='N';
-	char transb='N';
+	char transb='T';
 
 	if ( transa == 'N' )
 		lda = m;
@@ -170,7 +170,7 @@ int main (int argc, char *argv[])
 	{
 		error = fabs((cc[i] - cg[i]));
 		if ( error > 0.1e-4 )
-			printf("ERROR: %d:%.16f	%.16f	%.16f\n",i,error, cg[i],cc[i]);
+			printf("ERROR: %ld:%.16f	%.16f	%.16f\n",i,error, cg[i],cc[i]);
 	}
 
 

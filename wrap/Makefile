@@ -5,6 +5,12 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_wrap.so
 
+test: test-sgemm-wrap test-sgemm test-sgemm-cblas test-sgemm-cblas-wrap
+
+install:
+	 install libopenblas*.so ../lib
+
+
 wrap.o: wrap.c
 	gcc $(CFLAGS) -fPIC -c $(PFLAG) -I$(TOPDIR)  -o wrap.o wrap.c
 

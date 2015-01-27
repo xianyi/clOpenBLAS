@@ -1,8 +1,7 @@
 TOPDIR  = ../..
 include $(TOPDIR)/Makefile.system
 
-# PFLAG=-DPROFILE -DDEBUG
-CFLAG=-O2
+# GPU_PFLAGS=-DPROFILE -DDEBUG
 
 All: libopenblas_geforce_7xx.so
 
@@ -15,7 +14,7 @@ install:
 
 
 geforce_7xx.o: geforce_7xx.c geforce_7xx.h sgemm.c
-	$(CC) $(CFLAGS) -fPIC -c $(PFLAG) -I../include -I$(TOPDIR)   -o geforce_7xx.o geforce_7xx.c
+	$(CC) $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o geforce_7xx.o geforce_7xx.c
 
 
 libopenblas_geforce_7xx.so: geforce_7xx.o 

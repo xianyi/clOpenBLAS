@@ -1,7 +1,7 @@
 TOPDIR  = ../..
 include $(TOPDIR)/Makefile.system
 
-#PFLAG=-DPROFILE
+#GPU_PFLAGS=-DPROFILE
 
 All: libopenblas_nodev.so
 
@@ -11,7 +11,7 @@ install:
 	install libopenblas*.so ../lib
 
 nodev.o: nodev.c
-	gcc $(CFLAGS) -fPIC -c $(PFLAG) -I$(TOPDIR) -o nodev.o nodev.c
+	gcc $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I$(TOPDIR) -o nodev.o nodev.c
 
 libopenblas_nodev.so: nodev.o
 	gcc -shared -fPIC -o libopenblas_nodev.so nodev.o

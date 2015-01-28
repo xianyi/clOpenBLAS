@@ -1,3 +1,5 @@
+#!/usr/bin/Rscript
+
 a <- matrix(1:16, ncol = 2048, nrow = 2048)
 b <- matrix(1:16, ncol = 2048, nrow = 2048)
 c <- matrix(1:16, ncol = 2048, nrow = 2048)

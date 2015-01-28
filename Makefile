@@ -1,7 +1,7 @@
 TOPDIR  = ..
 include $(TOPDIR)/Makefile.system
 
-OCLDIRS = nodev wrap geforce_4xx geforce_7xx
+OCLDIRS = nodev wrap geforce_4xx geforce_7xx oland
 
 ocl:
 	for d in $(OCLDIRS) ; \

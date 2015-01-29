@@ -358,7 +358,7 @@ static int build_gpu_program(struct gpu_context *gpu, char *func)
         		start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 		#endif
 
-		ret = clBuildProgram(gpu->program, 1, &gpu->device_id, NULL, NULL, NULL);
+		ret = clBuildProgram(gpu->program, 1, &gpu->device_id, "-cl-mad-enable", NULL, NULL);
 
 		if ( ret != CL_SUCCESS )
 		{

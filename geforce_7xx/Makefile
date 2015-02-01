@@ -13,7 +13,7 @@ install:
 
 
 
-geforce_7xx.o: geforce_7xx.c geforce_7xx.h sgemm.c
+geforce_7xx.o: geforce_7xx.c geforce_7xx.h ../oland/sgemm.c ../oland/gemm_common.c
 	$(CC) $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o geforce_7xx.o geforce_7xx.c
 
 

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+
+octave -q << EOF
+N = 7680;
+
+printf("dgemm: %dx%d\n", N,N);
+
+A = double(rand(N,N));
+B = double(rand(N,N));
+
+start = clock();
+
+C = A * B;
+
+elapsedTime = etime(clock(), start);
+gFlops = 2*N*N*N/(elapsedTime * 1e+9);
+
+printf("Time:\t\t%f\n", elapsedTime);
+printf("GFlops:\t\t%f\n", gFlops);
+
+EOF
+

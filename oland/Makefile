@@ -13,7 +13,7 @@ install:
 
 
 
-oland.o: oland.c oland.h sgemm.c
+oland.o: oland.c oland.h sgemm.c gemm_common.c
 	$(CC) $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o oland.o oland.c
 
 

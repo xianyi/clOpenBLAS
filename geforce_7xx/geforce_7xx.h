@@ -1,3 +1,24 @@
+#define ALLOC_SIZE (4096*4096*4)
+
+#define SGEMM_M_MAX 4096
+#define SGEMM_N_MAX 4096
+#define SGEMM_K_MAX 4096
+
+#define SGEMM_GLOBAL0_DIV 8
+#define SGEMM_GLOBAL1_DIV 4
+
+#define SGEMM_LOCAL0 16
+#define SGEMM_LOCAL1 16
+
+#define SGEMM_PAD_M 128
+#define SGEMM_PAD_N 64
+#define SGEMM_PAD_K 16
+
+static char  *DEFAULT_KERNEL = "geforce_7xx";
+
+static char  *DEFAULT_DEVICE = "geforce_gtx_7";
+
+
 
 struct gpu_context
 {

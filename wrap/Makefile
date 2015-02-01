@@ -1,7 +1,7 @@
 TOPDIR  = ../..
 include $(TOPDIR)/Makefile.system
 
-# GPU_PFLAGS=-DDEBUG
+GPU_PFLAGS=-DDEBUG
 
 All: libopenblas_wrap.so
 
@@ -11,11 +11,11 @@ install:
 	 install libopenblas*.so ../lib
 
 
-wrap.o: wrap.c
+wrap.o: wrap.c sgemm.c dgemm.c
 	gcc $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I$(TOPDIR)  -o wrap.o wrap.c
 
 libopenblas_wrap.so: wrap.o
-	gcc $(CFLAGS) -shared -fPIC -o libopenblas_wrap.so wrap.o -L$(TOPDIR) -lopenblas -ldl
+	gcc $(CFLAGS) -shared -fPIC -o libopenblas_wrap.so wrap.o -L$(TOPDIR) -lopenblas -ldl -lpthread
 
 test-sgemm-wrap: test-sgemm.c $(TOPDIR)/libopenblas.so libopenblas_wrap.so
 	gcc $(CFLAGS) -o test-sgemm-wrap test-sgemm.c -L. -lopenblas_wrap

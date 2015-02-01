@@ -23,7 +23,8 @@ typedef union PPtr {
 } PPtr;
 
 __attribute__((reqd_work_group_size(8, 8, 1)))
-void __kernel sgemm_kernel( const uint M, const uint N, const uint K, const float alpha, const __global float8 *restrict A, const __global float8 *restrict B, __global float8 *C )
+void __kernel
+sgemm_kernel( const uint M, const uint N, const uint K, const float alpha, const __global float8 *restrict A, const __global float8 *restrict B, __global float8 *C )
 {
     float8 a0, a1, a2, a3;
     float8 b0, b1, b2, b3;
@@ -114,7 +115,7 @@ void __kernel sgemm_kernel( const uint M, const uint N, const uint K, const floa
 
     GPtr uC;
 
-    uC.f8v = C + (coord.x * ldc + coord.y)/8;
+    uC.f = C + (coord.x * ldc + coord.y)/8;
 
     uint ldc3 = ldc >> 3;
 

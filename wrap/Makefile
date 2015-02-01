@@ -1,7 +1,7 @@
 TOPDIR  = ../..
 include $(TOPDIR)/Makefile.system
 
-GPU_PFLAGS=-DDEBUG
+# GPU_PFLAGS=-DDEBUG
 
 All: libopenblas_wrap.so
 

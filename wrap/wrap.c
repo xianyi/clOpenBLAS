@@ -36,12 +36,12 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <dlfcn.h>
 
 #include <common.h>
-
+/*
 static void * handle = NULL;
 static void * ohandle = NULL;
 
 static void * (*blas_gpu_info)(int level3, char *st, blasint *m, blasint *n, blasint *k);
-
+*/
 void sgemm_(char * transa, char * transb, blasint *m, blasint *n, blasint *k, float *alpha, float *a, blasint *lda, float *b, blasint *ldb, float *beta, float * c, blasint *ldc );
 void dgemm_(char * transa, char * transb, blasint *m, blasint *n, blasint *k, double *alpha, double *a, blasint *lda, double *b, blasint *ldb, double *beta, double * c, blasint *ldc );
 
@@ -50,7 +50,7 @@ static void close_wrap() __attribute__((destructor));
 
 static void open_wrap()
 {
-
+/*
 	ohandle = dlopen( "libopenblas.so", RTLD_LAZY);
 
 
@@ -81,14 +81,24 @@ static void open_wrap()
 		#endif
 
 	}	
-
+*/
 }
 
 static void close_wrap()
 {
+	/*
 	if ( handle != NULL )
+	{
 		dlclose(handle);
+		handle=NULL;
+	}
 
+	if ( ohandle != NULL )
+	{
+		dlclose(ohandle);
+		ohandle=NULL;
+	}
+	*/
 }
 
 #include "sgemm.c"

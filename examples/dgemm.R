@@ -13,3 +13,4 @@ end - start
 g <- 2*2048*2048*2048/(end - start)
 "Gflops"
 g*1e-9
+

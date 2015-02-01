@@ -30,7 +30,6 @@ void dgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, doub
 	int ret;
 	int (*dgemm_gpu)();
 	void (*dgemm_cpu)();
-	char *p;
 
         int info = 0;
         int transa = -1;
@@ -83,11 +82,42 @@ void dgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, doub
 		printf("Running dgemm M=%d N=%d K=%d\n", *M, *N, *K);
 	#endif
 
+        char *p;
+	void * handle = NULL;
+	void * (*blas_gpu_info)() = NULL;
+
+        p=getenv("OPENBLAS_GPU_LIB");
+        if ( p == NULL)
+        {
+                #ifdef DEBUG
+                        fprintf(stderr, "Variable OPENBLAS_GPU_LIB not found\n");
+                #endif
+        }
+
+        handle = dlopen( p, RTLD_LAZY);
+        if ( handle == NULL )
+        {
+                #ifdef DEBUG
+                        fprintf(stderr,"%s\n",dlerror());
+                #endif
+        }
+	else
+	{
+        	blas_gpu_info = dlsym(handle, "blas_gpu_info");
+        	if ( blas_gpu_info == NULL )
+        	{
+                	#ifdef DEBUG
+                        	fprintf(stderr, "%s\n",dlerror());
+                	#endif
+		}
+
+        }
+
 
 	blasint minvalue;
 	int use_gpu = 1;
 
-	p = getenv("SGEMM_GPU_MINSIZE");
+	p = getenv("DGEMM_GPU_MINSIZE");
 	if ( p != NULL )
 	{
 		minvalue = (blasint) atol(p);
@@ -97,7 +127,7 @@ void dgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, doub
 	}
 	if ( blas_gpu_info && use_gpu)
 	{
-		dgemm_gpu = blas_gpu_info(3, "dgemm" , NULL, NULL, NULL);
+		dgemm_gpu = (blas_gpu_info)(3, "dgemm" , NULL, NULL, NULL);
         	if ( dgemm_gpu )
         	{
 			#ifdef DEBUG
@@ -112,6 +142,8 @@ void dgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, doub
 				return;
         	}
 	}
+
+	void * ohandle = dlopen("libopenblas.so",RTLD_LAZY);
 
 	if ( ohandle)
 		dgemm_cpu = dlsym(ohandle, "dgemm_");

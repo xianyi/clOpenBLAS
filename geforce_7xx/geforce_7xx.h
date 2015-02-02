@@ -1,8 +1,8 @@
-#define ALLOC_SIZE (4096*4096*4)
+#define ALLOC_SIZE (1920*3*1920*3*4)
 
-#define SGEMM_M_MAX 4096
-#define SGEMM_N_MAX 4096
-#define SGEMM_K_MAX 4096
+#define SGEMM_M_MAX (1920*3)
+#define SGEMM_N_MAX (1920*3)
+#define SGEMM_K_MAX (1920*3)
 
 #define SGEMM_GLOBAL0_DIV 8
 #define SGEMM_GLOBAL1_DIV 4

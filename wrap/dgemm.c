@@ -49,8 +49,11 @@ void dgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, doub
 	if ( p != NULL )
 	{
 		minvalue = (blasint) atol(p);
-		if ((minvalue > 0) && ((*M<minvalue) || (*N<minvalue) || (*K<minvalue)))
+		if ( minvalue < 0 )
 			use_gpu = 0;
+		else
+			if ((minvalue > 0) && ((*M<minvalue) || (*N<minvalue) || (*K<minvalue)))
+				use_gpu = 0;
 
 	}
 
@@ -132,7 +135,7 @@ void dgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, doub
 	}
 	if ( blas_gpu_info && use_gpu)
 	{
-		dgemm_gpu = (blas_gpu_info)(3, "dgemm" , NULL, NULL, NULL);
+		dgemm_gpu = (blas_gpu_info)(3, "dgemm" , M, N, K);
         	if ( dgemm_gpu )
         	{
 			#ifdef DEBUG

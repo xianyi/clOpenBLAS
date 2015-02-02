@@ -48,8 +48,11 @@ void sgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, floa
 	if ( p != NULL )
 	{
 		minvalue = (blasint) atol(p);
-		if ((minvalue > 0) && ((*M<minvalue) || (*N<minvalue) || (*K<minvalue)))
+		if ( minvalue < 0 )
 			use_gpu = 0;
+		else
+			if ((minvalue > 0) && ((*M<minvalue) || (*N<minvalue) || (*K<minvalue)))
+				use_gpu = 0;
 
 	}
 
@@ -135,7 +138,7 @@ void sgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, floa
 
 	if ( blas_gpu_info && use_gpu)
 	{
-		sgemm_gpu = blas_gpu_info(3, "sgemm" , NULL, NULL, NULL);
+		sgemm_gpu = blas_gpu_info(3, "sgemm" , M, N, K);
         	if ( sgemm_gpu )
         	{
 			#ifdef DEBUG
@@ -153,7 +156,7 @@ void sgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, floa
 
 	void * ohandle = dlopen("libopenblas.so",RTLD_LAZY);
 
-	if ( ohandle)
+	if ( ohandle )
 		sgemm_cpu = dlsym(ohandle, "sgemm_");
 	else
 		sgemm_cpu = dlsym(RTLD_NEXT, "sgemm_");

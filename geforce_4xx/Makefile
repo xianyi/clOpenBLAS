@@ -14,14 +14,14 @@ install:
 
 
 geforce_4xx.o: geforce_4xx.c geforce_4xx.h ../oland/sgemm.c ../oland/gemm_common.c
-	$(CC) $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o geforce_4xx.o geforce_4xx.c
+	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o geforce_4xx.o geforce_4xx.c
 
 
 libopenblas_geforce_4xx.so: geforce_4xx.o 
-	$(CC) -shared -fPIC -o libopenblas_geforce_4xx.so geforce_4xx.o $(OPENCL_LIB_DIR) -lOpenCL
+	$(CC) -fopenmp -shared -fPIC -o libopenblas_geforce_4xx.so geforce_4xx.o $(OPENCL_LIB_DIR) -lOpenCL
 
 test-sgemm-geforce_4xx: test-sgemm.c libopenblas_geforce_4xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_4xx.so
-	$(CC) $(CFLAGS) -o test-sgemm-geforce_4xx test-sgemm.c -L. -lopenblas_geforce_4xx -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-geforce_4xx test-sgemm.c -L. -lopenblas_geforce_4xx -L$(TOPDIR) -lopenblas
 
 
 

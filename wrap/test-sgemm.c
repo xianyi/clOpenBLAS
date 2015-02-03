@@ -18,9 +18,9 @@ int main (int argc, char *argv[])
 
 	int lda,ldb;
 
-	int m=1024*16;	
-	int n=1024*16;
-	int k=1024*8;	
+	int m=1024;	
+	int n=1024;
+	int k=1024;	
 
 	char transa='N';
 	char transb='T';

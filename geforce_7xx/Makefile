@@ -14,14 +14,14 @@ install:
 
 
 geforce_7xx.o: geforce_7xx.c geforce_7xx.h ../oland/sgemm.c ../oland/gemm_common.c
-	$(CC) $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o geforce_7xx.o geforce_7xx.c
+	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o geforce_7xx.o geforce_7xx.c
 
 
 libopenblas_geforce_7xx.so: geforce_7xx.o 
-	$(CC) -shared -fPIC -o libopenblas_geforce_7xx.so geforce_7xx.o $(OPENCL_LIB_DIR) -lOpenCL
+	$(CC) -fopenmp -shared -fPIC -o libopenblas_geforce_7xx.so geforce_7xx.o $(OPENCL_LIB_DIR) -lOpenCL
 
 test-sgemm-geforce_7xx: test-sgemm.c libopenblas_geforce_7xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_7xx.so
-	$(CC) $(CFLAGS) -o test-sgemm-geforce_7xx test-sgemm.c -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-geforce_7xx test-sgemm.c -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
 
 
 

@@ -25,22 +25,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <omp.h>
+
 /************************************* CCOPY *************************************************/
 static void sgemm_gpu_ccopy(int M, int N, float *A, int LDA, float *B, blasint LDB , float beta)
 {
 
    if ( beta == (float) 1.0)
    {
+	int m1 = M >> 3;
+	int m2 = M - m1 * 8;
 
 	int i;
+
+	#pragma omp parallel for num_threads(4)
 	for ( i = 0; i < N; i++)	
 	{
 		float *ap = A + i*LDA;
 		float *bp = B + i*LDB;
 
 		float ar[8];
-		int m1 = M >> 3;
-		int m2 = M - m1 * 8;
 
 		int j;
 	
@@ -81,16 +85,17 @@ static void sgemm_gpu_ccopy(int M, int N, float *A, int LDA, float *B, blasint L
 
    if ( beta == (float) 0.0)
    {
+	int m1 = M >> 3;
+	int m2 = M - m1 * 8;
 
 	int i;
+	#pragma omp parallel for num_threads(2)
 	for ( i = 0; i < N; i++)	
 	{
 		float *ap = A + i*LDA;
 		float *bp = B + i*LDB;
 
 		float ar[8];
-		int m1 = M >> 3;
-		int m2 = M - m1 * 8;
 
 		int j;
 	
@@ -129,15 +134,17 @@ static void sgemm_gpu_ccopy(int M, int N, float *A, int LDA, float *B, blasint L
 	return;
    }
 
+	int m1 = M >> 3;
+	int m2 = M - m1 * 8;
 	int i;
+
+	#pragma omp parallel for num_threads(4)
 	for ( i = 0; i < N; i++)	
 	{
 		float *ap = A + i*LDA;
 		float *bp = B + i*LDB;
 
 		float ar[8];
-		int m1 = M >> 3;
-		int m2 = M - m1 * 8;
 
 		int j;
 	
@@ -189,21 +196,20 @@ static void sgemm_gpu_bcopy(int M, int N, float *A , blasint LDA, float *B, int 
 	int pad_m = (( M + PAD_M - 1 ) & -PAD_M) - M;
 	int pad_n = (( N + PAD_N - 1 ) & -PAD_N) - N;
 
+	int n1 = N/8;
+	int n2 = N - n1*8;
 
-	float *a_ptr = A;
-	float *b_ptr = B;
-
-
+	#pragma omp parallel for num_threads(3)
 	for ( i=0; i < M ; i++ )
 	{
 
+		float *a_ptr = A + i * LDA;
+		float *b_ptr = B + i * (N + pad_n);
 		
 		float *ap = a_ptr;
 		float *bp = b_ptr;
 		int j;
 		float ar[8];
-		int n1 = N/8;
-		int n2 = N - n1*8;
 
 		for ( j=0; j < n1 ; j++ )
 		{
@@ -240,20 +246,21 @@ static void sgemm_gpu_bcopy(int M, int N, float *A , blasint LDA, float *B, int 
 		{
 			*(bp + j) = (float) 0.0;
 		}
-		a_ptr += LDA;
-		b_ptr += N + pad_n;
+		// a_ptr += LDA;
+		// b_ptr += N + pad_n;
 		
 	}
 
 	for ( i=M; i < M + pad_m; i++)
 	{
+		float *b_ptr = B + i * (N + pad_n);
 
 		int j;
 		for ( j=0; j < N + pad_n; j++ )
                 {
                         *(b_ptr + j) = (float) 0.0;
                 }
-		b_ptr += N + pad_n;
+		// b_ptr += N + pad_n;
 	}
 
 }
@@ -269,20 +276,24 @@ static void sgemm_gpu_acopy(int M, int K, float *A , blasint LDA, float *B, int 
 	int pad_k = (( K + PAD_K - 1 ) & -PAD_K) - K;
 
 
-	float *a_ptr = A;
-	float *b_ptr = B;
+	// float *a_ptr = A;
+	// float *b_ptr = B;
 
+	int m1 = M >> 4;
+	int m2 = M - m1 * 16;
 
+	#pragma omp parallel for num_threads(3)
 	for ( i=0; i < K ; i++ )
 	{
 
+		// printf("OMP Thread %d\n", omp_get_thread_num());
+		float *a_ptr = A + i * LDA;
+		float *b_ptr = B + i * (M + pad_m);
 		
 		float *ap = a_ptr;
 		float *bp = b_ptr;
 		int j;
 		float ar[16];
-		int m1 = M >> 4;
-		int m2 = M - m1 * 16;
 
 		for ( j=0; j < m1 ; j++ )
 		{
@@ -337,20 +348,21 @@ static void sgemm_gpu_acopy(int M, int K, float *A , blasint LDA, float *B, int 
 			*(bp + j) = (float) 0.0;
 			//  printf("j=%d	%f	%f\n",j,*(bp+j),0.0);
 		}
-		a_ptr += LDA;
-		b_ptr += M + pad_m;
+		// a_ptr += LDA;
+		// b_ptr += M + pad_m;
 		
 	}
 
 	for ( i=K; i < K + pad_k; i++)
 	{
+		float *b_ptr = B + i * (M + pad_m);
 
 		int j;
 		for ( j=0; j < M + pad_m; j++ )
                 {
                         *(b_ptr + j) = (float) 0.0;
                 }
-		b_ptr += M + pad_m;
+		// b_ptr += M + pad_m;
 	}
 
 }

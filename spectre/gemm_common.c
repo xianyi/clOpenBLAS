@@ -45,6 +45,13 @@ static void save_gpu_kernel(struct gpu_context *gpu, char * filename )
 }
 
 */
+
+static void pfn_build(cl_program program, void *ptr)
+{
+
+	printf("Build error\n");
+}
+
 static void replaceBlanks( char *s)
 {
 	char *p = s;
@@ -300,7 +307,7 @@ static int build_gpu_program(struct gpu_context *gpu, char *func)
         		start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 		#endif
 
-		ret = clBuildProgram(gpu->program, 1, &gpu->device_id, NULL, NULL, NULL);
+		ret = clBuildProgram(gpu->program, 1, &gpu->device_id, NULL, &pfn_build, NULL);
 
 		if ( ret != CL_SUCCESS )
 		{
@@ -340,6 +347,10 @@ static int build_gpu_program(struct gpu_context *gpu, char *func)
 
 }
 
+static void pfn_context(const char *errinfo, const void *private_info, size_t cb, void *user_data)
+{
+	printf("Context creation error\n");
+}
 
 static int create_gpu_context(struct gpu_context *gpu)
 {
@@ -465,7 +476,7 @@ static int create_gpu_context(struct gpu_context *gpu)
         	start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	#endif
 
-	gpu->context = clCreateContext( NULL, 1, &gpu->device_id, NULL, NULL, &ret);
+	gpu->context = clCreateContext( NULL, 1, &gpu->device_id, &pfn_context, NULL, &ret);
 	if ( ret != CL_SUCCESS )
 	{
 		#ifdef DEBUG
@@ -783,6 +794,12 @@ static int sgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, fl
 	#endif
 
         gpu_ptr->kernel = clCreateKernel(gpu_ptr->program, "sgemm_kernel", &ret);
+
+	if ( ret != CL_SUCCESS )
+	{
+		printf("Kernel Error %d\n", ret);
+		return(ret);
+	}
 
 	#ifdef PROFILE
         	gettimeofday(&tv,NULL);

@@ -44,9 +44,9 @@ static struct gpu_context gpu;
 static int have_gpu_context = 0;
 static cl_context gpu_context;
 
-#include "gemm_common.c"
+#include "../oland/gemm_common.c"
 
-#include "sgemm.c"
+#include "../oland/sgemm.c"
 
 void * blas_gpu_info(int level, char *bfunc, blasint *M, blasint *N, blasint *K)
 {

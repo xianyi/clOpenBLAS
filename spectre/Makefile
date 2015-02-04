@@ -14,14 +14,14 @@ install:
 
 
 spectre.o: spectre.c spectre.h sgemm.c gemm_common.c
-	$(CC) $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o spectre.o spectre.c
+	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o spectre.o spectre.c
 
 
 libopenblas_spectre.so: spectre.o 
-	$(CC) -shared -fPIC -o libopenblas_spectre.so spectre.o $(OPENCL_LIB_DIR) -lOpenCL
+	$(CC) -fopenmp -shared -fPIC -o libopenblas_spectre.so spectre.o $(OPENCL_LIB_DIR) -lOpenCL
 
 test-sgemm-spectre: test-sgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -o test-sgemm-spectre test-sgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-spectre test-sgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
 
 

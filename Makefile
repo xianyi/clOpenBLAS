@@ -2,7 +2,7 @@ TOPDIR  = ..
 include $(TOPDIR)/Makefile.system
 MAKE1 = make
 
-OCLDIRS = nodev wrap geforce_4xx geforce_7xx oland
+OCLDIRS = nodev wrap geforce_4xx geforce_7xx oland spectre
 
 ocl:
 	for d in $(OCLDIRS) ; \

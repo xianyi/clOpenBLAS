@@ -49,7 +49,8 @@ static void save_gpu_kernel(struct gpu_context *gpu, char * filename )
 static void pfn_build(cl_program program, void *ptr)
 {
 
-	printf("Build error\n");
+	// printf("Build error\n");
+	return;
 }
 
 static void replaceBlanks( char *s)
@@ -518,7 +519,7 @@ static int create_gpu_program_nonunified(struct gpu_context *gpu, char *func, si
 	#endif
 
 	#if defined(DEBUG) || defined(PROFILE)
-		gpu->command_queue = clCreateCommandQueue(gpu->context, gpu->device_id, CL_QUEUE_PROFILING_ENABLE, &ret);
+		gpu->command_queue = clCreateCommandQueue(gpu->context, gpu->device_id, 0, &ret);
 	#else
 		gpu->command_queue = clCreateCommandQueue(gpu->context, gpu->device_id, 0 , &ret);
 	#endif
@@ -780,6 +781,9 @@ static int sgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, fl
         double startg ,endg ,timeg;
 	#endif
 
+	int num_buff = 0;
+	cl_event buff_event[2];
+
         cl_int ret = 0;
 
         global_size[0] = M/SGEMM_GLOBAL0_DIV ;
@@ -832,57 +836,73 @@ static int sgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, fl
 
 	if ( acopy != 0 )
 	{
+		#ifdef PROFILE
+        		gettimeofday(&tv,NULL);
+        		startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		#endif
 
-	#ifdef PROFILE
-		cl_event perf_event;
-        	cl_ulong start, end;
-		ret |= clEnqueueWriteBuffer(gpu_ptr->command_queue, gpu_ptr->A, CL_TRUE, 0, M * K *sizeof(float), gpu_ptr->hA, 0, NULL, &perf_event);
-        	clWaitForEvents(1, &perf_event);
-        	clGetEventProfilingInfo(perf_event,CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, NULL);
-        	clGetEventProfilingInfo(perf_event,CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, NULL);
-        	printf("Prof: Enqueue A:\t\t\t%f sec\n", (double) (end - start) * (double) ( 1e-9) );
-	#else
-		ret |= clEnqueueWriteBuffer(gpu_ptr->command_queue, gpu_ptr->A, CL_TRUE, 0, M * K *sizeof(float), gpu_ptr->hA, 0, NULL, NULL);
-	#endif
+		ret |= clEnqueueWriteBuffer(gpu_ptr->command_queue, gpu_ptr->A, CL_FALSE, 0, M * K *sizeof(float), gpu_ptr->hA, 0, NULL, &buff_event[num_buff]);
+		num_buff++;
+
+		#ifdef PROFILE
+        		gettimeofday(&tv,NULL);
+        		endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+			timeg=endg-startg;
+			printf("Prof: Enqueue A:\t\t\t%f sec\n", timeg);
+		#endif
+
 
 	}
 
 	if ( bcopy != 0 )
 	{
-	#ifdef PROFILE
-		cl_event perf_event;
-        	cl_ulong start, end;
-		ret |= clEnqueueWriteBuffer(gpu_ptr->command_queue, gpu_ptr->B, CL_TRUE, 0, N * K *sizeof(float), gpu_ptr->hB, 0, NULL, &perf_event);
-        	clWaitForEvents(1, &perf_event);
-        	clGetEventProfilingInfo(perf_event,CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, NULL);
-        	clGetEventProfilingInfo(perf_event,CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, NULL);
-        	printf("Prof: Enqueue B:\t\t\t%f sec \n", (double) (end - start) * (double) ( 1e-9) );
-	#else
-		ret |= clEnqueueWriteBuffer(gpu_ptr->command_queue, gpu_ptr->B, CL_TRUE, 0, N * K *sizeof(float), gpu_ptr->hB, 0, NULL, NULL);
-	#endif
+		#ifdef PROFILE
+        		gettimeofday(&tv,NULL);
+        		startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		#endif
+
+		ret |= clEnqueueWriteBuffer(gpu_ptr->command_queue, gpu_ptr->B, CL_FALSE, 0, N * K *sizeof(float), gpu_ptr->hB, 0, NULL, &buff_event[num_buff]);
+		num_buff++;
+
+		#ifdef PROFILE
+        		gettimeofday(&tv,NULL);
+        		endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+			timeg=endg-startg;
+			printf("Prof: Enqueue B:\t\t\t%f sec\n", timeg);
+		#endif
+
 	}
 
 	#ifdef PROFILE
-		cl_event perf_event;
-        	cl_ulong start, end;
-        	ret = clEnqueueNDRangeKernel(gpu_ptr->command_queue,gpu_ptr->kernel, 2, NULL, global_size, local_size , 0, NULL, &perf_event);
-        	clWaitForEvents(1, &perf_event);
-        	clGetEventProfilingInfo(perf_event,CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, NULL);
-        	clGetEventProfilingInfo(perf_event,CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, NULL);
-        	printf("Prof: Kernel:\t\t\t\t%f sec\n", (double) (end - start) * (double) ( 1e-9) );
-		*ktime += (double) (end - start) * (double) ( 1e-9);
-	#else
-		ret |= clEnqueueNDRangeKernel(gpu_ptr->command_queue, gpu_ptr->kernel, 2, NULL, global_size, local_size , 0, NULL, NULL);
+        	gettimeofday(&tv,NULL);
+        	startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	#endif
+	cl_event perf_event;
+
+	ret |= clEnqueueNDRangeKernel(gpu_ptr->command_queue, gpu_ptr->kernel, 2, NULL, global_size, local_size , num_buff, buff_event, &perf_event);
 
 	#ifdef PROFILE
-		ret |= clEnqueueReadBuffer(gpu_ptr->command_queue, gpu_ptr->C, CL_TRUE, 0, M * N *sizeof(float), gpu_ptr->hC, 0, NULL, &perf_event);
         	clWaitForEvents(1, &perf_event);
-        	clGetEventProfilingInfo(perf_event,CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &start, NULL);
-        	clGetEventProfilingInfo(perf_event,CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &end, NULL);
-        	printf("Prof: Enqueue C:\t\t\t%f sec\n", (double) (end - start) * (double) ( 1e-9) );
-	#else
-		ret |= clEnqueueReadBuffer(gpu_ptr->command_queue, gpu_ptr->C, CL_TRUE, 0, M * N *sizeof(float), gpu_ptr->hC, 0, NULL, NULL);
+        	gettimeofday(&tv,NULL);
+        	endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		timeg=endg-startg;
+		printf("Prof: Enqueue kernel:\t\t\t%f sec\n", timeg);
+		*ktime += timeg;
+	#endif
+
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+	#endif
+
+	ret |= clEnqueueReadBuffer(gpu_ptr->command_queue, gpu_ptr->C, CL_TRUE, 0, M * N *sizeof(float), gpu_ptr->hC, 0, NULL, NULL);
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		timeg=endg-startg;
+		printf("Prof: Enqueue C:\t\t\t%f sec\n", timeg);
 	#endif
 
 	return(ret);

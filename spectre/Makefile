@@ -13,7 +13,7 @@ install:
 
 
 
-spectre.o: spectre.c spectre.h sgemm.c gemm_common.c
+spectre.o: spectre.c spectre.h ../oland/sgemm.c ../oland/gemm_common.c
 	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o spectre.o spectre.c
 
 

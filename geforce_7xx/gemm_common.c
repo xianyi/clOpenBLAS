@@ -545,7 +545,7 @@ static int create_gpu_program_nonunified(struct gpu_context *gpu, char *func, si
         	start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	#endif
 
-	gpu->hA = malloc(ALLOC);
+	gpu->hA = malloc((size_t) MALLOC_SIZE_A);
 	if ( gpu->hA == NULL)
 	{
 
@@ -569,7 +569,7 @@ static int create_gpu_program_nonunified(struct gpu_context *gpu, char *func, si
 	#endif
 
 
-	gpu->hB = malloc(ALLOC);
+	gpu->hB = malloc((size_t) MALLOC_SIZE_B);
 	if ( gpu->hB == NULL)
 	{
 		#ifdef DEBUG
@@ -591,7 +591,7 @@ static int create_gpu_program_nonunified(struct gpu_context *gpu, char *func, si
         	start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	#endif
 
-	gpu->hC = malloc(ALLOC);
+	gpu->hC = malloc((size_t) MALLOC_SIZE_C);
 	if ( gpu->hC == NULL)
 	{
 		#ifdef DEBUG
@@ -614,7 +614,7 @@ static int create_gpu_program_nonunified(struct gpu_context *gpu, char *func, si
 	#endif
 
 
-	gpu->A = clCreateBuffer(gpu->context, CL_MEM_READ_ONLY , ALLOC , NULL, &ret);
+	gpu->A = clCreateBuffer(gpu->context, CL_MEM_READ_ONLY , GALLOC_SIZE_A , NULL, &ret);
 	if ( ret != CL_SUCCESS )
 	{
 		#ifdef DEBUG
@@ -636,7 +636,7 @@ static int create_gpu_program_nonunified(struct gpu_context *gpu, char *func, si
         	start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	#endif
 
-	gpu->B = clCreateBuffer(gpu->context, CL_MEM_READ_ONLY , ALLOC , NULL, &ret);
+	gpu->B = clCreateBuffer(gpu->context, CL_MEM_READ_ONLY , GALLOC_SIZE_B , NULL, &ret);
 	if ( ret != CL_SUCCESS )
 	{
 		#ifdef DEBUG
@@ -659,7 +659,7 @@ static int create_gpu_program_nonunified(struct gpu_context *gpu, char *func, si
         	start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 	#endif
 
-	gpu->C = clCreateBuffer(gpu->context, CL_MEM_WRITE_ONLY , ALLOC , NULL, &ret);
+	gpu->C = clCreateBuffer(gpu->context, CL_MEM_WRITE_ONLY , GALLOC_SIZE_C , NULL, &ret);
 	if ( ret != CL_SUCCESS )
 	{
 		#ifdef DEBUG

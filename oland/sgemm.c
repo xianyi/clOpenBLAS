@@ -792,7 +792,7 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 				#ifdef PROFILE
 					printf("----------------------------------------------------------------------------------\n");
         				gettimeofday(&tv,NULL);
-        			start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+        				start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 				#endif
 
 				sgemm_gpu_acopy(sgemm_m, sgemm_k, a_ptr, *LDA, (float*) gpu.hA, SGEMM_PAD_M, SGEMM_PAD_K);
@@ -804,6 +804,20 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 					printf("Sgemm acopy:\t\t\t\t%f sec\n", time);
 				#endif
 
+				#ifdef PROFILE
+        				gettimeofday(&tv,NULL);
+        				start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+				#endif
+
+				clEnqueueWriteBuffer(gpu.command_queue, gpu.A, CL_FALSE, 0, sgemm_m_run * sgemm_k_run *sizeof(float), gpu.hA, 0, NULL, NULL);
+
+				#ifdef PROFILE
+        				gettimeofday(&tv,NULL);
+        				end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+					time=end-start;
+					printf("Prof: enqueue A:\t\t\t%f sec\n", time);
+				#endif
+
 			}
 			else
 			{
@@ -812,7 +826,7 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 				#ifdef PROFILE
 					printf("----------------------------------------------------------------------------------\n");
         				gettimeofday(&tv,NULL);
-        			start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+        				start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 				#endif
 
 				memset(gpu.hA, 0, (size_t) sgemm_m_run * sgemm_k_run * sizeof(float));
@@ -823,6 +837,20 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         				end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 					time=end-start;
 					printf("Sgemm atcopy:\t\t\t\t%f sec\n", time);
+				#endif
+
+				#ifdef PROFILE
+        				gettimeofday(&tv,NULL);
+        				start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+				#endif
+
+				clEnqueueWriteBuffer(gpu.command_queue, gpu.A, CL_FALSE, 0, sgemm_m_run * sgemm_k_run *sizeof(float), gpu.hA, 0, NULL, NULL);
+
+				#ifdef PROFILE
+        				gettimeofday(&tv,NULL);
+        				end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+					time=end-start;
+					printf("Prof: enqueue A:\t\t\t%f sec\n", time);
 				#endif
 
 
@@ -863,8 +891,6 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 
 						memset(gpu.hB, 0, (size_t) sgemm_n_run * sgemm_k_run * sizeof(float));
 						sgemm_gpu_btcopy(sgemm_n, sgemm_k, b_ptr, *LDB, (float*) gpu.hB, SGEMM_PAD_N, SGEMM_PAD_K);
-						bcopy = 1;
-						b_ptr_old = b_ptr;
 
 						#ifdef PROFILE
         						gettimeofday(&tv,NULL);
@@ -873,6 +899,22 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 							printf("Sgemm btcopy:\t\t\t\t%f sec\n", time);
 						#endif
 
+						#ifdef PROFILE
+        						gettimeofday(&tv,NULL);
+        						start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+						#endif
+
+						clEnqueueWriteBuffer(gpu.command_queue, gpu.B, CL_FALSE, 0, sgemm_n_run * sgemm_k_run *sizeof(float), gpu.hB, 0, NULL, NULL);
+
+						#ifdef PROFILE
+        						gettimeofday(&tv,NULL);
+        						end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+							time=end-start;
+							printf("Prof: enqueue B:\t\t\t%f sec\n", time);
+						#endif
+
+						bcopy = 1;
+						b_ptr_old = b_ptr;
 					}
 					else
 						bcopy = 0;
@@ -890,7 +932,25 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         						gettimeofday(&tv,NULL);
         						start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 						#endif
+
 						sgemm_gpu_bcopy(sgemm_k, sgemm_n, b_ptr, *LDB, (float*) gpu.hB, SGEMM_PAD_K, SGEMM_PAD_N);
+
+						#ifdef PROFILE
+        						gettimeofday(&tv,NULL);
+        						end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+							time=end-start;
+							printf("Sgemm bcopy:\t\t\t\t%f sec\n", time);
+						#endif
+
+
+						#ifdef PROFILE
+        						gettimeofday(&tv,NULL);
+        						start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+						#endif
+
+						clEnqueueWriteBuffer(gpu.command_queue, gpu.B, CL_FALSE, 0, sgemm_n_run * sgemm_k_run *sizeof(float), gpu.hB, 0, NULL, NULL);
+
+
 						bcopy = 1;
 						b_ptr_old = b_ptr;
 
@@ -898,7 +958,7 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         						gettimeofday(&tv,NULL);
         						end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 							time=end-start;
-							printf("Sgemm bcopy:\t\t\t\t%f sec\n", time);
+							printf("Prof: enqueue B:\t\t\t%f sec\n", time);
 						#endif
 
 	

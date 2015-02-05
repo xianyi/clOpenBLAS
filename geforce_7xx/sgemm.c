@@ -25,22 +25,26 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
+#include <omp.h>
+
 /************************************* CCOPY *************************************************/
 static void sgemm_gpu_ccopy(int M, int N, float *A, int LDA, float *B, blasint LDB , float beta)
 {
 
    if ( beta == (float) 1.0)
    {
+	int m1 = M >> 3;
+	int m2 = M - m1 * 8;
 
 	int i;
+
+	#pragma omp parallel for num_threads(4)
 	for ( i = 0; i < N; i++)	
 	{
 		float *ap = A + i*LDA;
 		float *bp = B + i*LDB;
 
 		float ar[8];
-		int m1 = M >> 3;
-		int m2 = M - m1 * 8;
 
 		int j;
 	
@@ -81,16 +85,17 @@ static void sgemm_gpu_ccopy(int M, int N, float *A, int LDA, float *B, blasint L
 
    if ( beta == (float) 0.0)
    {
+	int m1 = M >> 3;
+	int m2 = M - m1 * 8;
 
 	int i;
+	#pragma omp parallel for num_threads(2)
 	for ( i = 0; i < N; i++)	
 	{
 		float *ap = A + i*LDA;
 		float *bp = B + i*LDB;
 
 		float ar[8];
-		int m1 = M >> 3;
-		int m2 = M - m1 * 8;
 
 		int j;
 	
@@ -129,15 +134,17 @@ static void sgemm_gpu_ccopy(int M, int N, float *A, int LDA, float *B, blasint L
 	return;
    }
 
+	int m1 = M >> 3;
+	int m2 = M - m1 * 8;
 	int i;
+
+	#pragma omp parallel for num_threads(4)
 	for ( i = 0; i < N; i++)	
 	{
 		float *ap = A + i*LDA;
 		float *bp = B + i*LDB;
 
 		float ar[8];
-		int m1 = M >> 3;
-		int m2 = M - m1 * 8;
 
 		int j;
 	
@@ -189,21 +196,20 @@ static void sgemm_gpu_bcopy(int M, int N, float *A , blasint LDA, float *B, int 
 	int pad_m = (( M + PAD_M - 1 ) & -PAD_M) - M;
 	int pad_n = (( N + PAD_N - 1 ) & -PAD_N) - N;
 
+	int n1 = N/8;
+	int n2 = N - n1*8;
 
-	float *a_ptr = A;
-	float *b_ptr = B;
-
-
+	#pragma omp parallel for num_threads(3)
 	for ( i=0; i < M ; i++ )
 	{
 
+		float *a_ptr = A + i * LDA;
+		float *b_ptr = B + i * (N + pad_n);
 		
 		float *ap = a_ptr;
 		float *bp = b_ptr;
 		int j;
 		float ar[8];
-		int n1 = N/8;
-		int n2 = N - n1*8;
 
 		for ( j=0; j < n1 ; j++ )
 		{
@@ -240,20 +246,21 @@ static void sgemm_gpu_bcopy(int M, int N, float *A , blasint LDA, float *B, int 
 		{
 			*(bp + j) = (float) 0.0;
 		}
-		a_ptr += LDA;
-		b_ptr += N + pad_n;
+		// a_ptr += LDA;
+		// b_ptr += N + pad_n;
 		
 	}
 
 	for ( i=M; i < M + pad_m; i++)
 	{
+		float *b_ptr = B + i * (N + pad_n);
 
 		int j;
 		for ( j=0; j < N + pad_n; j++ )
                 {
                         *(b_ptr + j) = (float) 0.0;
                 }
-		b_ptr += N + pad_n;
+		// b_ptr += N + pad_n;
 	}
 
 }
@@ -269,20 +276,24 @@ static void sgemm_gpu_acopy(int M, int K, float *A , blasint LDA, float *B, int 
 	int pad_k = (( K + PAD_K - 1 ) & -PAD_K) - K;
 
 
-	float *a_ptr = A;
-	float *b_ptr = B;
+	// float *a_ptr = A;
+	// float *b_ptr = B;
 
+	int m1 = M >> 4;
+	int m2 = M - m1 * 16;
 
+	#pragma omp parallel for num_threads(3)
 	for ( i=0; i < K ; i++ )
 	{
 
+		// printf("OMP Thread %d\n", omp_get_thread_num());
+		float *a_ptr = A + i * LDA;
+		float *b_ptr = B + i * (M + pad_m);
 		
 		float *ap = a_ptr;
 		float *bp = b_ptr;
 		int j;
 		float ar[16];
-		int m1 = M >> 4;
-		int m2 = M - m1 * 16;
 
 		for ( j=0; j < m1 ; j++ )
 		{
@@ -337,20 +348,21 @@ static void sgemm_gpu_acopy(int M, int K, float *A , blasint LDA, float *B, int 
 			*(bp + j) = (float) 0.0;
 			//  printf("j=%d	%f	%f\n",j,*(bp+j),0.0);
 		}
-		a_ptr += LDA;
-		b_ptr += M + pad_m;
+		// a_ptr += LDA;
+		// b_ptr += M + pad_m;
 		
 	}
 
 	for ( i=K; i < K + pad_k; i++)
 	{
+		float *b_ptr = B + i * (M + pad_m);
 
 		int j;
 		for ( j=0; j < M + pad_m; j++ )
                 {
                         *(b_ptr + j) = (float) 0.0;
                 }
-		b_ptr += M + pad_m;
+		// b_ptr += M + pad_m;
 	}
 
 }
@@ -488,7 +500,7 @@ static void sgemm_gpu_atcopy(int M, int K, float *A , blasint LDA, float *B, int
 
 static void sgemm_gpu_btcopy(int M, int K, float *A , blasint LDA, float *B, int PAD_M, int PAD_K)
 {
-	int i;
+	unsigned long i=0;
 
 	int pad_m = (( M + PAD_M - 1 ) & -PAD_M) - M;
 
@@ -498,12 +510,16 @@ static void sgemm_gpu_btcopy(int M, int K, float *A , blasint LDA, float *B, int
 	float *a_ptr = A;
 	float *b_ptr = B;
 
+	// #pragma omp parallel for num_threads(3)
 	for ( i=0; i < (M/4)*4 ; i+=4 )
 	{
 
+		// float *a_ptr = A + i * (unsigned long) LDA;
+		// float *b_ptr = B + i * 4;
+	
 		
 		float *ap = a_ptr;
-		float *ap1 = a_ptr + LDA;
+		float *ap1 = ap  + LDA;
 		float *ap2 = ap1 + LDA;
 		float *ap3 = ap2 + LDA;
 
@@ -597,6 +613,8 @@ static void sgemm_gpu_btcopy(int M, int K, float *A , blasint LDA, float *B, int
 	for ( ; i < M ; i++ )
 	{
 
+		//float *a_ptr = A + i * LDA;
+		//float *b_ptr = B + i ;
 		
 		float *ap = a_ptr;
 		float *bp = b_ptr;
@@ -639,8 +657,8 @@ static void sgemm_gpu_btcopy(int M, int K, float *A , blasint LDA, float *B, int
 			ap++;
 		}
 
-		a_ptr += 2*LDA;
-		b_ptr += 2;
+		a_ptr += 1*LDA;
+		b_ptr += 1;
 	}
 
 }
@@ -654,9 +672,10 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 	int ret;
 
 	#ifdef PROFILE
-        struct timeval tv;
-        double start,end,time;
+        	struct timeval tv;
+        	double start,end,time;
 	#endif
+
 	double ktime = 0.0;
 
 	if ( have_gpu_context == 0 )
@@ -722,8 +741,26 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 	}
 
 
+	void *bcopy_ptr[SGEMM_N_BUFFERS + 1];
+	int i1;
+	for (i1 = 0; i1 < SGEMM_N_BUFFERS+1; i1++)
+		bcopy_ptr[i1] = gpu.hB + i1 * GALLOC_SIZE_B;
 
-	float *b_ptr_old = NULL;
+	int SGEMM_M_MAX_RUN;
+	int SGEMM_N_MAX_RUN;
+	int SGEMM_K_MAX_RUN = SGEMM_K_MAX;
+
+
+	if ( transA == 'N' )
+		SGEMM_M_MAX_RUN = SGEMM_M_MAX;
+	else
+		SGEMM_M_MAX_RUN = 1536;
+	
+	if ( transB == 'N' )
+		SGEMM_N_MAX_RUN = 1536;
+	else
+		SGEMM_N_MAX_RUN = SGEMM_N_MAX;
+	
 
 	int bcopy = 1;
 	int acopy = 1;
@@ -738,15 +775,17 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 	int sgemm_n_run;
 	int sgemm_k_run;
 
-	int sgemm_k = SGEMM_K_MAX;
+	int sgemm_k = SGEMM_K_MAX_RUN;
 	int l=0;
 
-	while ( sgemm_k == SGEMM_K_MAX )
+	while ( sgemm_k == SGEMM_K_MAX_RUN )
 	{
 		
-		if ( l * SGEMM_K_MAX + sgemm_k > *K )
+		int saved_bcopy=-1;
+
+		if ( l * SGEMM_K_MAX_RUN + sgemm_k > *K )
 		{
-			sgemm_k = *K % SGEMM_K_MAX;
+			sgemm_k = *K % SGEMM_K_MAX_RUN;
 			if ( sgemm_k == 0 )
 			{
 				break;
@@ -755,14 +794,14 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 
 		sgemm_k_run = ( sgemm_k + SGEMM_PAD_K - 1 ) & -SGEMM_PAD_K;
 
-		int sgemm_m = SGEMM_M_MAX;
+		int sgemm_m = SGEMM_M_MAX_RUN;
 		int i=0;
 
-		while ( sgemm_m == SGEMM_M_MAX )
+		while ( sgemm_m == SGEMM_M_MAX_RUN )
 		{
-			if ( i * SGEMM_M_MAX + sgemm_m > *M )
+			if ( i * SGEMM_M_MAX_RUN + sgemm_m > *M )
 			{
-				sgemm_m = *M % SGEMM_M_MAX;
+				sgemm_m = *M % SGEMM_M_MAX_RUN;
 				if ( sgemm_m == 0 )
 				{
 					break;
@@ -775,12 +814,12 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 
 			if ( transA == 'N' )
 			{
-				a_ptr = A + l* SGEMM_K_MAX * *LDA + i * SGEMM_M_MAX;
+				a_ptr = A + l* SGEMM_K_MAX_RUN * *LDA + i * SGEMM_M_MAX_RUN;
 
 				#ifdef PROFILE
 					printf("----------------------------------------------------------------------------------\n");
         				gettimeofday(&tv,NULL);
-        			start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+        				start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 				#endif
 
 				sgemm_gpu_acopy(sgemm_m, sgemm_k, a_ptr, *LDA, (float*) gpu.hA, SGEMM_PAD_M, SGEMM_PAD_K);
@@ -792,15 +831,29 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 					printf("Sgemm acopy:\t\t\t\t%f sec\n", time);
 				#endif
 
+				#ifdef PROFILE
+        				gettimeofday(&tv,NULL);
+        				start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+				#endif
+
+				clEnqueueWriteBuffer(gpu.command_queue, gpu.A, CL_FALSE, 0, sgemm_m_run * sgemm_k_run *sizeof(float), gpu.hA, 0, NULL, NULL);
+
+				#ifdef PROFILE
+        				gettimeofday(&tv,NULL);
+        				end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+					time=end-start;
+					printf("Prof: enqueue A:\t\t\t%f sec\n", time);
+				#endif
+
 			}
 			else
 			{
-				a_ptr = A + i * SGEMM_M_MAX * *LDA + l * SGEMM_K_MAX;
+				a_ptr = A + i * SGEMM_M_MAX_RUN * *LDA + l * SGEMM_K_MAX_RUN;
 
 				#ifdef PROFILE
 					printf("----------------------------------------------------------------------------------\n");
         				gettimeofday(&tv,NULL);
-        			start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+        				start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 				#endif
 
 				memset(gpu.hA, 0, (size_t) sgemm_m_run * sgemm_k_run * sizeof(float));
@@ -813,19 +866,35 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 					printf("Sgemm atcopy:\t\t\t\t%f sec\n", time);
 				#endif
 
+				#ifdef PROFILE
+        				gettimeofday(&tv,NULL);
+        				start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+				#endif
+
+				clEnqueueWriteBuffer(gpu.command_queue, gpu.A, CL_FALSE, 0, sgemm_m_run * sgemm_k_run *sizeof(float), gpu.hA, 0, NULL, NULL);
+
+				#ifdef PROFILE
+        				gettimeofday(&tv,NULL);
+        				end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+					time=end-start;
+					printf("Prof: enqueue A:\t\t\t%f sec\n", time);
+				#endif
+
 
 			}
 
-			int sgemm_n = SGEMM_N_MAX;
+			int sgemm_n = SGEMM_N_MAX_RUN;
 			int j=0;
 			acopy = 1;
 
-			while ( sgemm_n == SGEMM_N_MAX )
+			int curr_bcopy = 0;
+
+			while ( sgemm_n == SGEMM_N_MAX_RUN )
 			{
 
-				if ( j * SGEMM_N_MAX + sgemm_n > *N )
+				if ( j * SGEMM_N_MAX_RUN + sgemm_n > *N )
 				{
-					sgemm_n = *N % SGEMM_N_MAX;
+					sgemm_n = *N % SGEMM_N_MAX_RUN;
 					if ( sgemm_n == 0 )
 					{
 						break;
@@ -834,14 +903,14 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 
 				sgemm_n_run = ( sgemm_n + SGEMM_PAD_N - 1 ) & -SGEMM_PAD_N;
 
-				float *c_ptr = C + j * SGEMM_N_MAX * *LDC + i * SGEMM_M_MAX; 
+				float *c_ptr = C + j * SGEMM_N_MAX_RUN * *LDC + i * SGEMM_M_MAX_RUN; 
 				float *b_ptr;
 
 				if ( transB == 'N' )
 				{
-					b_ptr = B + j* SGEMM_N_MAX * *LDB + l*SGEMM_K_MAX;
+					b_ptr = B + j* SGEMM_N_MAX_RUN * *LDB + l*SGEMM_K_MAX_RUN;
 
-					if ( b_ptr != b_ptr_old )
+					if ( curr_bcopy > saved_bcopy )
 					{
 
 						#ifdef PROFILE
@@ -849,10 +918,18 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         						start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 						#endif
 
-						memset(gpu.hB, 0, (size_t) sgemm_n_run * sgemm_k_run * sizeof(float));
-						sgemm_gpu_btcopy(sgemm_n, sgemm_k, b_ptr, *LDB, (float*) gpu.hB, SGEMM_PAD_N, SGEMM_PAD_K);
-						bcopy = 1;
-						b_ptr_old = b_ptr;
+						if ( curr_bcopy < SGEMM_N_BUFFERS )
+						{
+							memset(bcopy_ptr[curr_bcopy], 0, (size_t) sgemm_n_run * sgemm_k_run * sizeof(float));
+							sgemm_gpu_btcopy(sgemm_n, sgemm_k, b_ptr, *LDB, (float*) bcopy_ptr[curr_bcopy], SGEMM_PAD_N, SGEMM_PAD_K);
+							saved_bcopy++;
+						}
+						else
+						{
+							memset(bcopy_ptr[SGEMM_N_BUFFERS], 0, (size_t) sgemm_n_run * sgemm_k_run * sizeof(float));
+							sgemm_gpu_btcopy(sgemm_n, sgemm_k, b_ptr, *LDB, (float*) bcopy_ptr[SGEMM_N_BUFFERS], SGEMM_PAD_N, SGEMM_PAD_K);
+
+						}
 
 						#ifdef PROFILE
         						gettimeofday(&tv,NULL);
@@ -860,27 +937,50 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 							time=end-start;
 							printf("Sgemm btcopy:\t\t\t\t%f sec\n", time);
 						#endif
-
 					}
+
+					#ifdef PROFILE
+        					gettimeofday(&tv,NULL);
+        					start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+					#endif
+
+					if ( curr_bcopy < SGEMM_N_BUFFERS )
+						clEnqueueWriteBuffer(gpu.command_queue, gpu.B, CL_FALSE, 0, sgemm_n_run * sgemm_k_run *sizeof(float), bcopy_ptr[curr_bcopy], 0, NULL, NULL);
 					else
-						bcopy = 0;
+						clEnqueueWriteBuffer(gpu.command_queue, gpu.B, CL_FALSE, 0, sgemm_n_run * sgemm_k_run *sizeof(float), bcopy_ptr[SGEMM_N_BUFFERS], 0, NULL, NULL);
+
+					#ifdef PROFILE
+        					gettimeofday(&tv,NULL);
+        					end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+						time=end-start;
+						printf("Prof: enqueue B:\t\t\t%f sec\n", time);
+					#endif
+
 
 
 				}
 				else
 				{
-					b_ptr = B + l* SGEMM_K_MAX * *LDB + j*SGEMM_N_MAX;
+					b_ptr = B + l* SGEMM_K_MAX_RUN * *LDB + j*SGEMM_N_MAX_RUN;
 
-					if ( b_ptr != b_ptr_old )
+					if ( curr_bcopy > saved_bcopy )
 					{
 
 						#ifdef PROFILE
         						gettimeofday(&tv,NULL);
         						start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 						#endif
-						sgemm_gpu_bcopy(sgemm_k, sgemm_n, b_ptr, *LDB, (float*) gpu.hB, SGEMM_PAD_K, SGEMM_PAD_N);
-						bcopy = 1;
-						b_ptr_old = b_ptr;
+
+						if ( curr_bcopy < SGEMM_N_BUFFERS )
+						{
+							sgemm_gpu_bcopy(sgemm_k, sgemm_n, b_ptr, *LDB, (float*) bcopy_ptr[curr_bcopy], SGEMM_PAD_K, SGEMM_PAD_N);
+							saved_bcopy++;
+						}
+						else
+						{
+							sgemm_gpu_bcopy(sgemm_k, sgemm_n, b_ptr, *LDB, (float*) bcopy_ptr[SGEMM_N_BUFFERS], SGEMM_PAD_K, SGEMM_PAD_N);
+
+						}
 
 						#ifdef PROFILE
         						gettimeofday(&tv,NULL);
@@ -888,12 +988,25 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 							time=end-start;
 							printf("Sgemm bcopy:\t\t\t\t%f sec\n", time);
 						#endif
-
-	
 					}
+
+					#ifdef PROFILE
+        					gettimeofday(&tv,NULL);
+        					start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+					#endif
+
+					if ( curr_bcopy < SGEMM_N_BUFFERS )
+						clEnqueueWriteBuffer(gpu.command_queue, gpu.B, CL_FALSE, 0, sgemm_n_run * sgemm_k_run *sizeof(float), bcopy_ptr[curr_bcopy], 0, NULL, NULL);
 					else
-						bcopy = 0;
-					
+						clEnqueueWriteBuffer(gpu.command_queue, gpu.B, CL_FALSE, 0, sgemm_n_run * sgemm_k_run *sizeof(float), bcopy_ptr[SGEMM_N_BUFFERS], 0, NULL, NULL);
+
+					#ifdef PROFILE
+       						gettimeofday(&tv,NULL);
+       						end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+						time=end-start;
+						printf("Prof: enqueue B:\t\t\t%f sec\n", time);
+					#endif
+
 
 				}
 
@@ -922,6 +1035,7 @@ static int sgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
 
 				acopy = 0;
 				j++;
+				curr_bcopy++;
 
 			}
 			i++;

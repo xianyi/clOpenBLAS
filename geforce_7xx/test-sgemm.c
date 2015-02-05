@@ -21,12 +21,12 @@ int main (int argc, char *argv[])
 
 	int lda,ldb;
 
-	int m=5670;	
-	int n=5670;
-	int k=5670;	
+	int m=2048*4;	
+	int n=1536*8;
+	int k=2048*4;	
 
-	char transa='N';
-	char transb='T';
+	char transa='T';
+	char transb='N';
 
 	if ( transa == 'N' )
 		lda = m;

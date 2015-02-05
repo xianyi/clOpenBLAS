@@ -4,6 +4,16 @@
 #define SGEMM_N_MAX 4096
 #define SGEMM_K_MAX 4096
 
+#define SGEMM_N_BUFFERS 16
+
+#define GALLOC_SIZE_A ( SGEMM_M_MAX * SGEMM_K_MAX * sizeof(float) )
+#define GALLOC_SIZE_B ( SGEMM_N_MAX * SGEMM_K_MAX * sizeof(float) )
+#define GALLOC_SIZE_C ( SGEMM_M_MAX * SGEMM_N_MAX * sizeof(float) )
+
+#define MALLOC_SIZE_A GALLOC_SIZE_A
+#define MALLOC_SIZE_B ( GALLOC_SIZE_B * ( SGEMM_N_BUFFERS + 1 ) )
+#define MALLOC_SIZE_C GALLOC_SIZE_C
+
 #define SGEMM_GLOBAL0_DIV 8
 #define SGEMM_GLOBAL1_DIV 8
 

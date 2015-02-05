@@ -13,7 +13,7 @@ install:
 
 
 
-geforce_4xx.o: geforce_4xx.c geforce_4xx.h ../oland/sgemm.c ../oland/gemm_common.c
+geforce_4xx.o: geforce_4xx.c geforce_4xx.h sgemm.c gemm_common.c
 	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o geforce_4xx.o geforce_4xx.c
 
 

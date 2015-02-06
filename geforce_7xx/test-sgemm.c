@@ -25,8 +25,8 @@ int main (int argc, char *argv[])
 	int n=1536*8;
 	int k=2048*4;	
 
-	char transa='T';
-	char transb='N';
+	char transa='N';
+	char transb='T';
 
 	if ( transa == 'N' )
 		lda = m;
@@ -60,52 +60,25 @@ int main (int argc, char *argv[])
 	cg=(float *) c1;
 	cc=(float *) c2;
 
-	// memset(a,0,2*4096*4096*4);
 	for( i = 0; i<m; i++)
 	{
 		for ( j = 0; j< k ; j++)
 		{
-				// *a = (((float) rand() / (float) RAND_MAX) - 0.5) * 1e-1 ;
+				*a = (((float) rand() / (float) RAND_MAX) - 0.5) * 1e-1 ;
 				// *a = (float) (10*i+k+1) ;
-				*a = (float) 1.0;
+				// *a = (float) 1.0;
 				a++;
 		}	
-/*
-		for ( j=k ; j<16; j++ )
-		{
-			*a = (float) 0.0;
-			a++;
-		}
-*/		
 	}			
-/*
-	for ( i=m ; i<128; i++ )
-	{
-		for ( j=0; j<16; j++)
-		{
-			*a = (float) 0.0;
-			a++;
-		}
-	}	
-*/
-	// memset(b,0,2*4096*4096*4);
-	// #pragma omp parallel for
 	for( i = 0; i<k; i++)
 	{
 		for( j=0; j<n; j++)
 		{
-			//*b = (((float) rand() / (float) RAND_MAX) - 0.5) * 1e-1;
-			*b = (float) (0+1) ;
+			*b = (((float) rand() / (float) RAND_MAX) - 0.5) * 1e-1;
+			// *b = (float) (0+1) ;
 			//*b = (float) (i+k+1) ;
 			b++;
 		}
-/*
-		for ( j=n ; j<64; j++ )
-		{
-			*b = (float) 0.0;
-			b++;
-		}
-*/
 	}			
 
 	// #pragma omp parallel for

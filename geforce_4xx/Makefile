@@ -5,7 +5,7 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_geforce_4xx.so
 
-test: test-sgemm-geforce_4xx
+test: test-sgemm-geforce_4xx test-dgemm-geforce_4xx
 
 install:
 	install libopenblas*.so ../lib
@@ -24,9 +24,15 @@ test-sgemm-geforce_4xx: test-sgemm.c libopenblas_geforce_4xx.so $(TOPDIR)/libope
 	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-geforce_4xx test-sgemm.c -L. -lopenblas_geforce_4xx -L$(TOPDIR) -lopenblas
 
 
+test-dgemm-geforce_4xx: test-dgemm.c libopenblas_geforce_4xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_4xx.so
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-geforce_4xx test-dgemm.c -L. -lopenblas_geforce_4xx -L$(TOPDIR) -lopenblas
+
+
+
 
 
 clean:
 	rm -f *.o
 	rm -f *.so
 	rm -f test-sgemm-*
+	rm -f test-dgemm-*

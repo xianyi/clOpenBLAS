@@ -31,6 +31,10 @@ if [ -z "OPENBLAS_GPU_LIB" ]; then
 	export OPENBLAS_GPU_LIB=libopenblas_geforce_7xx.so
 fi
 
+# opional: export a path to the icd files
+# export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
+
+
 # optional: set a search string for a device
 # if the device is not found
 
@@ -49,5 +53,5 @@ export CGEMM_GPU_MINSIZE=-1
 export ZGEMM_GPU_MINSIZE=-1
 
 # optional: always preload libopenblas_wrap.so
-export LD_PRELOAD=$OCL_DIR/lib/libopenblas_wrap.so:$LD_PRELOAD
+# export LD_PRELOAD=$OCL_DIR/lib/libopenblas_wrap.so:$LD_PRELOAD
 

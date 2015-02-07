@@ -47,6 +47,7 @@ static cl_context gpu_context;
 #include "gemm_common.c"
 
 #include "sgemm.c"
+#include "dgemm.c"
 
 void * blas_gpu_info(int level, char *bfunc, blasint *M, blasint *N, blasint *K)
 {
@@ -74,6 +75,21 @@ void * blas_gpu_info(int level, char *bfunc, blasint *M, blasint *N, blasint *K)
 				return(foo);
 			}
 			break;
+                        break;
+
+                case 'd':
+                case 'D':
+                        if ( !strncasecmp(bfunc,"dgemm", 6))
+                        {
+                                if ( (M != NULL ) && (*M < DGEMM_PAD_M) ) return(NULL);
+                                if ( (N != NULL ) && (*N < DGEMM_PAD_N) ) return(NULL);
+                                if ( (K != NULL ) && (*K < DGEMM_PAD_K) ) return(NULL);
+
+                                foo = &dgemm_gpu_simple;
+                                return(foo);
+                        }
+                        break;
+
 
 		default: return(NULL);
 	}

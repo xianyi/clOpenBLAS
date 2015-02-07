@@ -5,7 +5,7 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_oland.so
 
-test: test-sgemm-oland
+test: test-sgemm-oland test-dgemm-oland
 
 install:
 	install libopenblas*.so ../lib
@@ -24,9 +24,16 @@ test-sgemm-oland: test-sgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so lib
 	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-oland test-sgemm.c -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
 
 
+test-dgemm-oland: test-dgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-oland test-dgemm.c -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+
+
+
 
 
 clean:
 	rm -f *.o
 	rm -f *.so
 	rm -f test-sgemm-*
+	rm -f test-dgemm-*
+

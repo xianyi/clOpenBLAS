@@ -29,15 +29,15 @@
 #define SGEMM_PAD_N 64
 #define SGEMM_PAD_K 16
 
-#define DGEMM_GLOBAL0_DIV 8
+#define DGEMM_GLOBAL0_DIV 4
 #define DGEMM_GLOBAL1_DIV 4
 
-#define DGEMM_LOCAL0 16
-#define DGEMM_LOCAL1 16
+#define DGEMM_LOCAL0 8
+#define DGEMM_LOCAL1 8
 
-#define DGEMM_PAD_M 128
-#define DGEMM_PAD_N 64
-#define DGEMM_PAD_K 16
+#define DGEMM_PAD_M 32
+#define DGEMM_PAD_N 32
+#define DGEMM_PAD_K 8 
 
 
 static char  *DEFAULT_KERNEL = "geforce_4xx";

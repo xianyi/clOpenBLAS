@@ -21,9 +21,9 @@ int main (int argc, char *argv[])
 
 	int lda,ldb;
 
-	int m=2048*2;	
-	int n=2048*4;
-	int k=2048*2;	
+	int m=4096;	
+	int n=8192;
+	int k=2048;	
 
 	char transa='N';
 	char transb='T';
@@ -76,14 +76,14 @@ int main (int argc, char *argv[])
 		for( j=0; j<n; j++)
 		{
 			*b = (((double) rand() / (double) RAND_MAX) - 0.5) * 1e-1;
-			// *b = (double) (0+1) ;
+			//*b = (double) (0+1) ;
 			//*b = (double) (i+k+1) ;
 			b++;
 		}
 	}			
 
 	// #pragma omp parallel for
-	for( i = 0; i<n; i++)
+	for( i = 0; i<n*2; i++)
 	{
 		for(j=0; j<m; j++)
 		{
@@ -140,11 +140,17 @@ int main (int argc, char *argv[])
 	timec=end-start;
 
 
-	for(i=0; i<m*n; i++)
+	int z=0;
+	for(i=0; i<n*2; i++)
 	{
-		error = fabs((cc[i] - cg[i]));
-		if ( error > 0.1e-10 )
-			printf("ERROR: %ld:%.16f	%.16f	%.16f\n",i,error, cg[i],cc[i]);
+		for ( j=0; j < m; j++)
+		{
+			error = fabs((cc[z] - cg[z]));
+			if ( error > 0.1e-10 )
+				printf("ERROR: %ld,%ld:%.16f	%.16f	%.16f\n",i,j,error, cg[z],cc[z]);
+
+			z++;
+		}
 	}
 
 

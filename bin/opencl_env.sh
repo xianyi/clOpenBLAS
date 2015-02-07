@@ -32,7 +32,7 @@ if [ -z "OPENBLAS_GPU_LIB" ]; then
 fi
 
 # opional: export a path to the icd files
-# export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
+export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
 
 
 # optional: set a search string for a device

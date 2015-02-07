@@ -4,7 +4,12 @@
 #define SGEMM_N_MAX 4096
 #define SGEMM_K_MAX 4096
 
+#define DGEMM_M_MAX 2048
+#define DGEMM_N_MAX 2048
+#define DGEMM_K_MAX 4096
+
 #define SGEMM_N_BUFFERS 16
+#define DGEMM_N_BUFFERS 16
 
 #define GALLOC_SIZE_A ( SGEMM_M_MAX * SGEMM_K_MAX * sizeof(float) )
 #define GALLOC_SIZE_B ( SGEMM_N_MAX * SGEMM_K_MAX * sizeof(float) )
@@ -23,6 +28,17 @@
 #define SGEMM_PAD_M 64
 #define SGEMM_PAD_N 64
 #define SGEMM_PAD_K 4
+
+#define DGEMM_GLOBAL0_DIV 4
+#define DGEMM_GLOBAL1_DIV 4
+
+#define DGEMM_LOCAL0 8
+#define DGEMM_LOCAL1 8
+
+#define DGEMM_PAD_M 32
+#define DGEMM_PAD_N 32
+#define DGEMM_PAD_K 4 
+
 
 static char  *DEFAULT_KERNEL = "spectre";
 

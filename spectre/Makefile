@@ -5,7 +5,7 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_spectre.so
 
-test: test-sgemm-spectre
+test: test-sgemm-spectre test-dgemm-spectre
 
 install:
 	install libopenblas*.so ../lib
@@ -24,9 +24,17 @@ test-sgemm-spectre: test-sgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so
 	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-spectre test-sgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
 
+test-dgemm-spectre: test-dgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-spectre test-dgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+
+
+
 
 
 clean:
 	rm -f *.o
 	rm -f *.so
 	rm -f test-sgemm-*
+	rm -f test-dgemm-*
+
+

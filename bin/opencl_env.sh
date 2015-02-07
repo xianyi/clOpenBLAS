@@ -32,11 +32,11 @@ if [ -z "OPENBLAS_GPU_LIB" ]; then
 fi
 
 # opional: export a path to the icd files
-export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
+#export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
 
 
 # optional: set a search string for a device
-# if the device is not found
+# if the device is not found or you want to test the library with another device
 
 # export OPENBLAS_CL_DEVICE=oland
 # export OPENBLAS_CL_DEVICE=spectre
@@ -45,6 +45,13 @@ export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
 # export OPENBLAS_CL_DEVICE=geforce
 # export OPENBLAS_CL_DEVICE=cpu
 
+# optional: mask available Nvidia devices
+# export CUDA_VISIBLE_DEVICES=0
+# export CUDA_VISIBLE_DEVICES=0,1
+
+# optional: mask available AMD devices
+# export GPU_DEVICE_ORDINAL=0
+# export GPU_DEVICE_ORDINAL=0,1
 
 # optional: set Minimum sizes for gemm functions or disable the function by setting -1
 export SGEMM_GPU_MINSIZE=2048

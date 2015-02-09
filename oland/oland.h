@@ -8,8 +8,13 @@
 #define DGEMM_N_MAX 2048
 #define DGEMM_K_MAX 4096
 
+#define CGEMM_M_MAX 2048
+#define CGEMM_N_MAX 2048
+#define CGEMM_K_MAX 4096
+
 #define SGEMM_N_BUFFERS 16
 #define DGEMM_N_BUFFERS 16
+#define CGEMM_N_BUFFERS 16
 
 #define GALLOC_SIZE_A ( SGEMM_M_MAX * SGEMM_K_MAX * sizeof(float) )
 #define GALLOC_SIZE_B ( SGEMM_N_MAX * SGEMM_K_MAX * sizeof(float) )
@@ -38,6 +43,18 @@
 #define DGEMM_PAD_M 32
 #define DGEMM_PAD_N 32
 #define DGEMM_PAD_K 4 
+
+#define CGEMM_GLOBAL0_DIV 4
+#define CGEMM_GLOBAL1_DIV 4
+
+#define CGEMM_LOCAL0 8
+#define CGEMM_LOCAL1 8
+
+#define CGEMM_PAD_M 32
+#define CGEMM_PAD_N 32
+#define CGEMM_PAD_K 4 
+
+
 
 
 static char  *DEFAULT_KERNEL = "oland";
@@ -70,14 +87,29 @@ static int  create_gpu_context(struct gpu_context *gpu);
 static int  create_gpu_program_nonunified(struct gpu_context *gpu, char *func ,size_t bufsize);
 static void destroy_gpu_context(struct gpu_context *gpu);
 static void release_gpu_program(struct gpu_context *gpu);
+static void open_gpu()  __attribute__((constructor));
+static void close_gpu() __attribute__((destructor));
 
 static void sgemm_gpu_ccopy(int M, int N, float *A, int LDA, float *B, blasint LDB, float beta) __attribute__ ((noinline));
 static void sgemm_gpu_acopy(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
 static void sgemm_gpu_btcopy(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
 static void sgemm_gpu_bcopy(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
 static int  sgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, float ALPHA, int acopy, int bcopy, double *ktime) __attribute__ ((noinline));
-static void open_gpu()  __attribute__((constructor));
-static void close_gpu() __attribute__((destructor));
+
+static void dgemm_gpu_ccopy(int M, int N, double *A, int LDA, double *B, blasint LDB, double beta) __attribute__ ((noinline));
+static void dgemm_gpu_acopy(int M, int N, double *A , blasint LDA, double *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void dgemm_gpu_btcopy(int M, int N, double *A , blasint LDA, double *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void dgemm_gpu_bcopy(int M, int N, double *A , blasint LDA, double *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static int  dgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, double ALPHA, int acopy, int bcopy, double *ktime) __attribute__ ((noinline));
+
+static void cgemm_gpu_ccopy(int M, int N, float *A, int LDA, float *B, blasint LDB, float *beta) __attribute__ ((noinline));
+static void cgemm_gpu_acopy(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void cgemm_gpu_btcopy(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void cgemm_gpu_btcopy_conj(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void cgemm_gpu_bcopy(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void cgemm_gpu_bcopy_conj(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static int  cgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, float *ALPHA, int acopy, int bcopy, double *ktime) __attribute__ ((noinline));
+
 
 
 

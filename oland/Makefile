@@ -5,7 +5,7 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_oland.so
 
-test: test-sgemm-oland test-dgemm-oland
+test: test-sgemm-oland test-dgemm-oland test-cgemm-oland
 
 install:
 	install libopenblas*.so ../lib
@@ -13,7 +13,7 @@ install:
 
 
 
-oland.o: oland.c oland.h sgemm.c gemm_common.c
+oland.o: oland.c oland.h sgemm.c gemm_common.c dgemm.c cgemm.c
 	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o oland.o oland.c
 
 
@@ -28,6 +28,9 @@ test-dgemm-oland: test-dgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so lib
 	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-oland test-dgemm.c -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
 
 
+test-cgemm-oland: test-cgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
+	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-oland test-cgemm.c -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+
 
 
 
@@ -36,4 +39,5 @@ clean:
 	rm -f *.so
 	rm -f test-sgemm-*
 	rm -f test-dgemm-*
+	rm -f test-cgemm-*
 

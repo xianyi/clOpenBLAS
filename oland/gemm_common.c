@@ -1004,3 +1004,142 @@ static int dgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, do
 	return(ret);
 }
 
+static int cgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, float *ALPHA, int acopy, int bcopy , double *ktime)
+{
+
+	size_t global_size[3];
+        size_t local_size[3];
+
+	#ifdef PROFILE
+        struct timeval tv;
+        double startg ,endg ,timeg;
+	#endif
+
+
+        cl_int ret = 0;
+
+        global_size[0] = M/CGEMM_GLOBAL0_DIV ;
+        global_size[1] = N/CGEMM_GLOBAL1_DIV ;
+
+        local_size[0]  = CGEMM_LOCAL0;
+        local_size[1]  = CGEMM_LOCAL1;
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+	#endif
+
+        gpu_ptr->kernel = clCreateKernel(gpu_ptr->program, "cgemm_kernel", &ret);
+
+	if ( ret != CL_SUCCESS )
+	{
+		printf("Kernel Error %d\n", ret);
+		return(ret);
+	}
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		timeg=endg-startg;
+		printf("OpenCL create kernel:\t\t\t%f sec\n", timeg);
+	#endif
+
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+	#endif
+
+	ret |= clSetKernelArg(gpu_ptr->kernel, 0, sizeof(int), (void *) &M);
+        ret |= clSetKernelArg(gpu_ptr->kernel, 1, sizeof(int), (void *) &N);
+        ret |= clSetKernelArg(gpu_ptr->kernel, 2, sizeof(int), (void *) &K);
+        ret |= clSetKernelArg(gpu_ptr->kernel, 3, sizeof(float*), (void *) ALPHA);
+        ret |= clSetKernelArg(gpu_ptr->kernel, 4, sizeof(cl_mem), (void *) &gpu_ptr->A);
+        ret |= clSetKernelArg(gpu_ptr->kernel, 5, sizeof(cl_mem), (void *) &gpu_ptr->B);
+        ret |= clSetKernelArg(gpu_ptr->kernel, 6, sizeof(cl_mem), (void *) &gpu_ptr->C);
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		timeg=endg-startg;
+		printf("OpenCL kernel args:\t\t\t%f sec\n", timeg);
+	#endif
+
+/*
+	if ( acopy != 0 )
+	{
+		#ifdef PROFILE
+        		gettimeofday(&tv,NULL);
+        		startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		#endif
+
+		ret |= clEnqueueWriteBuffer(gpu_ptr->command_queue, gpu_ptr->A, CL_FALSE, 0, M * K *sizeof(float), gpu_ptr->hA, 0, NULL, &buff_event[num_buff]);
+		num_buff++;
+
+		#ifdef PROFILE
+        		gettimeofday(&tv,NULL);
+        		endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+			timeg=endg-startg;
+			printf("Prof: Enqueue A:\t\t\t%f sec\n", timeg);
+		#endif
+
+
+	}
+
+	if ( bcopy != 0 )
+	{
+		#ifdef PROFILE
+        		gettimeofday(&tv,NULL);
+        		startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		#endif
+
+		ret |= clEnqueueWriteBuffer(gpu_ptr->command_queue, gpu_ptr->B, CL_FALSE, 0, N * K *sizeof(float), gpu_ptr->hB, 0, NULL, &buff_event[num_buff]);
+		num_buff++;
+
+		#ifdef PROFILE
+        		gettimeofday(&tv,NULL);
+        		endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+			timeg=endg-startg;
+			printf("Prof: Enqueue B:\t\t\t%f sec\n", timeg);
+		#endif
+
+	}
+*/
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+	#endif
+	cl_event perf_event;
+
+	// clFinish(gpu_ptr->command_queue);
+	ret |= clEnqueueNDRangeKernel(gpu_ptr->command_queue, gpu_ptr->kernel, 2, NULL, global_size, local_size , 0, NULL, &perf_event);
+
+	#ifdef PROFILE
+        	clWaitForEvents(1, &perf_event);
+        	gettimeofday(&tv,NULL);
+        	endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		timeg=endg-startg;
+		printf("Prof: Enqueue kernel:\t\t\t%f sec\n", timeg);
+		*ktime += timeg;
+	#endif
+
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	startg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+	#endif
+
+	ret |= clEnqueueReadBuffer(gpu_ptr->command_queue, gpu_ptr->C, CL_TRUE, 0, M * N *sizeof(float) *2, gpu_ptr->hC, 0, NULL, NULL);
+
+	#ifdef PROFILE
+        	gettimeofday(&tv,NULL);
+        	endg=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
+		timeg=endg-startg;
+		printf("Prof: Enqueue C:\t\t\t%f sec\n", timeg);
+	#endif
+
+	return(ret);
+}
+
+

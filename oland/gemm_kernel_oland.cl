@@ -1,3 +1,5 @@
+#pragma OPENCL EXTENSION cl_khr_fp64 : enable
+
 typedef union GPtr {
     __global float *f;
     __global double *d;
@@ -368,7 +370,6 @@ void __kernel
 
 
 
-#pragma OPENCL EXTENSION cl_khr_fp64 : enable
 
 __attribute__((reqd_work_group_size(8, 8, 1)))
 void __kernel

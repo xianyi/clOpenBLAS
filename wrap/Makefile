@@ -11,7 +11,7 @@ install:
 	 install libopenblas*.so ../lib
 
 
-wrap.o: wrap.c sgemm.c dgemm.c
+wrap.o: wrap.c sgemm.c dgemm.c cgemm.c
 	gcc $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I$(TOPDIR)  -o wrap.o wrap.c
 
 libopenblas_wrap.so: wrap.o

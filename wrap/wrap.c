@@ -44,6 +44,7 @@ static void * (*blas_gpu_info)(int level3, char *st, blasint *m, blasint *n, bla
 */
 void sgemm_(char * transa, char * transb, blasint *m, blasint *n, blasint *k, float *alpha, float *a, blasint *lda, float *b, blasint *ldb, float *beta, float * c, blasint *ldc );
 void dgemm_(char * transa, char * transb, blasint *m, blasint *n, blasint *k, double *alpha, double *a, blasint *lda, double *b, blasint *ldb, double *beta, double * c, blasint *ldc );
+void cgemm_(char * transa, char * transb, blasint *m, blasint *n, blasint *k, float *alpha, float *a, blasint *lda, float *b, blasint *ldb, float *beta, float * c, blasint *ldc );
 
 static void open_wrap()  __attribute__((constructor));
 static void close_wrap() __attribute__((destructor));
@@ -103,4 +104,5 @@ static void close_wrap()
 
 #include "sgemm.c"
 #include "dgemm.c"
+#include "cgemm.c"
 

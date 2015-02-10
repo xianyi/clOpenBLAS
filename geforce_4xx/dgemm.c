@@ -828,7 +828,7 @@ static int dgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         				gettimeofday(&tv,NULL);
         				end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 					time=end-start;
-					printf("Sgemm acopy:\t\t\t\t%f sec\n", time);
+					printf("Dgemm acopy:\t\t\t\t%f sec\n", time);
 				#endif
 
 				#ifdef PROFILE
@@ -863,7 +863,7 @@ static int dgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         				gettimeofday(&tv,NULL);
         				end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 					time=end-start;
-					printf("Sgemm atcopy:\t\t\t\t%f sec\n", time);
+					printf("Dgemm atcopy:\t\t\t\t%f sec\n", time);
 				#endif
 
 				#ifdef PROFILE
@@ -935,7 +935,7 @@ static int dgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         						gettimeofday(&tv,NULL);
         						end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 							time=end-start;
-							printf("Sgemm btcopy:\t\t\t\t%f sec\n", time);
+							printf("Dgemm btcopy:\t\t\t\t%f sec\n", time);
 						#endif
 					}
 
@@ -986,7 +986,7 @@ static int dgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         						gettimeofday(&tv,NULL);
         						end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 							time=end-start;
-							printf("Sgemm bcopy:\t\t\t\t%f sec\n", time);
+							printf("Dgemm bcopy:\t\t\t\t%f sec\n", time);
 						#endif
 					}
 
@@ -1029,7 +1029,7 @@ static int dgemm_gpu_simple(char *TRANSA, char *TRANSB, blasint *M, blasint *N, 
         				gettimeofday(&tv,NULL);
         				end=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 					time=end-start;
-					printf("Sgemm ccopy:\t\t\t\t%f sec\n\n", time);
+					printf("Dgemm ccopy:\t\t\t\t%f sec\n\n", time);
 				#endif
 
 

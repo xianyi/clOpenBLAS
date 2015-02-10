@@ -5,7 +5,7 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_spectre.so
 
-test: test-sgemm-spectre test-dgemm-spectre
+test: test-sgemm-spectre test-dgemm-spectre test-cgemm-spectre test-zgemm-spectre
 
 install:
 	install libopenblas*.so ../lib
@@ -13,7 +13,7 @@ install:
 
 
 
-spectre.o: spectre.c spectre.h sgemm.c gemm_common.c
+spectre.o: spectre.c spectre.h sgemm.c gemm_common.c dgemm.c cgemm.c zgemm.c
 	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o spectre.o spectre.c
 
 
@@ -28,7 +28,12 @@ test-dgemm-spectre: test-dgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so
 	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-spectre test-dgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
 
+test-cgemm-spectre: test-cgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
+	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-spectre test-cgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
+
+test-zgemm-spectre: test-zgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
+	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-spectre test-zgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
 
 clean:
@@ -36,5 +41,7 @@ clean:
 	rm -f *.so
 	rm -f test-sgemm-*
 	rm -f test-dgemm-*
+	rm -f test-cgemm-*
+	rm -f test-zgemm-*
 
 

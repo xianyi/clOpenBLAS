@@ -49,6 +49,7 @@ static cl_context gpu_context;
 #include "sgemm.c"
 #include "dgemm.c"
 #include "cgemm.c"
+#include "zgemm.c"
 
 void * blas_gpu_info(int level, char *bfunc, blasint *M, blasint *N, blasint *K)
 {
@@ -104,6 +105,21 @@ void * blas_gpu_info(int level, char *bfunc, blasint *M, blasint *N, blasint *K)
                                 return(foo);
                         }
                         break;
+
+		case 'z':
+		case 'Z':
+			if ( !strncasecmp(bfunc,"zgemm", 6))
+			{
+				if ( (M != NULL ) && (*M < ZGEMM_PAD_M) ) return(NULL);
+				if ( (N != NULL ) && (*N < ZGEMM_PAD_N) ) return(NULL);
+				if ( (K != NULL ) && (*K < ZGEMM_PAD_K) ) return(NULL);
+
+				foo = &zgemm_gpu_simple;
+				return(foo);
+			}
+			break;
+
+
 
 
 		default: return(NULL);

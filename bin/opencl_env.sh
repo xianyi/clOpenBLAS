@@ -31,7 +31,7 @@ if [ -z "OPENBLAS_GPU_LIB" ]; then
 	export OPENBLAS_GPU_LIB=libopenblas_geforce_7xx.so
 fi
 
-# opional: export a path to the icd files
+# optional: export a path to the icd files
 #export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
 
 
@@ -56,7 +56,7 @@ fi
 # optional: set Minimum sizes for gemm functions or disable the function by setting -1
 export SGEMM_GPU_MINSIZE=2048
 export DGEMM_GPU_MINSIZE=-1
-export CGEMM_GPU_MINSIZE=-1
+export CGEMM_GPU_MINSIZE=1024
 export ZGEMM_GPU_MINSIZE=-1
 
 # optional: always preload libopenblas_wrap.so

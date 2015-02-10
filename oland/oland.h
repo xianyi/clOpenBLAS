@@ -12,9 +12,14 @@
 #define CGEMM_N_MAX 2048
 #define CGEMM_K_MAX 4096
 
+#define ZGEMM_M_MAX 1024
+#define ZGEMM_N_MAX 1024
+#define ZGEMM_K_MAX 4096
+
 #define SGEMM_N_BUFFERS 16
 #define DGEMM_N_BUFFERS 16
 #define CGEMM_N_BUFFERS 16
+#define ZGEMM_N_BUFFERS 16
 
 #define GALLOC_SIZE_A ( SGEMM_M_MAX * SGEMM_K_MAX * sizeof(float) )
 #define GALLOC_SIZE_B ( SGEMM_N_MAX * SGEMM_K_MAX * sizeof(float) )
@@ -54,7 +59,15 @@
 #define CGEMM_PAD_N 32
 #define CGEMM_PAD_K 4 
 
+#define ZGEMM_GLOBAL0_DIV 2
+#define ZGEMM_GLOBAL1_DIV 2
 
+#define ZGEMM_LOCAL0 8
+#define ZGEMM_LOCAL1 8
+
+#define ZGEMM_PAD_M 16
+#define ZGEMM_PAD_N 16
+#define ZGEMM_PAD_K 4 
 
 
 static char  *DEFAULT_KERNEL = "oland";
@@ -109,6 +122,16 @@ static void cgemm_gpu_btcopy_conj(int M, int N, float *A , blasint LDA, float *B
 static void cgemm_gpu_bcopy(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
 static void cgemm_gpu_bcopy_conj(int M, int N, float *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
 static int  cgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, float *ALPHA, int acopy, int bcopy, double *ktime) __attribute__ ((noinline));
+
+
+static void zgemm_gpu_ccopy(int M, int N, double *A, int LDA, double *B, blasint LDB, double *beta) __attribute__ ((noinline));
+static void zgemm_gpu_acopy(int M, int N, double *A , blasint LDA, double *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void zgemm_gpu_btcopy(int M, int N, double *A , blasint LDA, double *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void zgemm_gpu_btcopy_conj(int M, int N, double *A , blasint LDA, double *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void zgemm_gpu_bcopy(int M, int N, double *A , blasint LDA, double *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void zgemm_gpu_bcopy_conj(int M, int N, double *A , blasint LDA, double *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static int  zgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, double *ALPHA, int acopy, int bcopy, double *ktime) __attribute__ ((noinline));
+
 
 
 

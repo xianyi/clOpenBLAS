@@ -22,17 +22,17 @@ fi
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$OPENBLAS_DIR:$OCL_DIR/lib
 
 # required: search path for opencl source files
-if [ -z "OPENBLAS_CL_DIR" ]; then
+if [ -z "$OPENBLAS_CL_DIR" ]; then
 	export OPENBLAS_CL_DIR=$OCL_DIR/libcl
 fi
 
 # required: the gpu library, that you want to use
-if [ -z "OPENBLAS_GPU_LIB" ]; then
+if [ -z "$OPENBLAS_GPU_LIB" ]; then
 	export OPENBLAS_GPU_LIB=libopenblas_geforce_7xx.so
 fi
 
 # optional: export a path to the icd files
-#export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
+export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
 
 
 # optional: set a search string for a device

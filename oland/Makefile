@@ -21,19 +21,19 @@ libopenblas_oland.so: oland.o
 	$(CC) -fopenmp -shared -fPIC -o libopenblas_oland.so oland.o $(OPENCL_LIB_DIR) -lOpenCL
 
 test-sgemm-oland: test-sgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-oland test-sgemm.c -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-oland test-sgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
 
 
 test-dgemm-oland: test-dgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-oland test-dgemm.c -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-oland test-dgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
 
 
 test-cgemm-oland: test-cgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-oland test-cgemm.c -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-oland test-cgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
 
 
 test-zgemm-oland: test-zgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-oland test-zgemm.c -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-oland test-zgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
 
 
 

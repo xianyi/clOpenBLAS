@@ -21,19 +21,19 @@ libopenblas_spectre.so: spectre.o
 	$(CC) -fopenmp -shared -fPIC -o libopenblas_spectre.so spectre.o $(OPENCL_LIB_DIR) -lOpenCL
 
 test-sgemm-spectre: test-sgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-spectre test-sgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-spectre test-sgemm.c $(FEXTRALIB) -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
 
 test-dgemm-spectre: test-dgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-spectre test-dgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-spectre test-dgemm.c $(FEXTRALIB) -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
 
 test-cgemm-spectre: test-cgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-spectre test-cgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-spectre test-cgemm.c $(FEXTRALIB)  -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
 
 test-zgemm-spectre: test-zgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-spectre test-zgemm.c -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-spectre test-zgemm.c $(FEXTRALIB)  -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
 
 
 clean:

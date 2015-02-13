@@ -21,11 +21,11 @@ libopenblas_geforce_4xx.so: geforce_4xx.o
 	$(CC) -fopenmp -shared -fPIC -o libopenblas_geforce_4xx.so geforce_4xx.o $(OPENCL_LIB_DIR) -lOpenCL
 
 test-sgemm-geforce_4xx: test-sgemm.c libopenblas_geforce_4xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_4xx.so
-	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-geforce_4xx test-sgemm.c -L. -lopenblas_geforce_4xx -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-geforce_4xx test-sgemm.c $(FEXTRALIB) -L. -lopenblas_geforce_4xx -L$(TOPDIR) -lopenblas
 
 
 test-dgemm-geforce_4xx: test-dgemm.c libopenblas_geforce_4xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_4xx.so
-	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-geforce_4xx test-dgemm.c -L. -lopenblas_geforce_4xx -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-geforce_4xx test-dgemm.c $(FEXTRALIB) -L. -lopenblas_geforce_4xx -L$(TOPDIR) -lopenblas
 
 
 

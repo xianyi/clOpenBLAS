@@ -21,10 +21,10 @@ libopenblas_geforce_7xx.so: geforce_7xx.o
 	$(CC) -fopenmp -shared -fPIC -o libopenblas_geforce_7xx.so geforce_7xx.o $(OPENCL_LIB_DIR) -lOpenCL
 
 test-sgemm-geforce_7xx: test-sgemm.c libopenblas_geforce_7xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_7xx.so
-	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-geforce_7xx test-sgemm.c -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-geforce_7xx test-sgemm.c $(FEXTRALIB)  -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
 
 test-dgemm-geforce_7xx: test-dgemm.c libopenblas_geforce_7xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_7xx.so
-	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-geforce_7xx test-dgemm.c -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-geforce_7xx test-dgemm.c $(FEXTRALIB)  -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
 
 
 clean:

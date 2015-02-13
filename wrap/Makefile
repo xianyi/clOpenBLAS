@@ -12,22 +12,22 @@ install:
 
 
 wrap.o: wrap.c sgemm.c dgemm.c cgemm.c zgemm.c
-	gcc $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I$(TOPDIR)  -o wrap.o wrap.c
+	$(CC) $(CFLAGS) -fPIC -c $(GPU_PFLAGS) -I$(TOPDIR)  -o wrap.o wrap.c
 
 libopenblas_wrap.so: wrap.o
-	gcc $(CFLAGS) -shared -fPIC -o libopenblas_wrap.so wrap.o -L$(TOPDIR) -lopenblas -ldl -lpthread
+	$(CC) $(CFLAGS) -shared -fPIC -o libopenblas_wrap.so wrap.o -L$(TOPDIR) -lopenblas -ldl -lpthread
 
 test-sgemm-wrap: test-sgemm.c $(TOPDIR)/libopenblas.so libopenblas_wrap.so
-	gcc $(CFLAGS) -o test-sgemm-wrap test-sgemm.c -L. -lopenblas_wrap
+	$(CC) $(CFLAGS) -o test-sgemm-wrap test-sgemm.c $(FEXTRALIB) -L. -lopenblas_wrap
 
 test-sgemm: test-sgemm.c $(TOPDIR)/libopenblas.so
-	gcc $(CFLAGS) -o test-sgemm test-sgemm.c -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -o test-sgemm test-sgemm.c $(FEXTRALIB) -L$(TOPDIR) -lopenblas
 
 test-sgemm-cblas: test-sgemm-cblas.c $(TOPDIR)/libopenblas.so
-	gcc $(CFLAGS) -o test-sgemm-cblas test-sgemm-cblas.c -L$(TOPDIR) -lopenblas
+	$(CC) $(CFLAGS) -o test-sgemm-cblas test-sgemm-cblas.c $(FEXTRALIB) -L$(TOPDIR) -lopenblas
 
 test-sgemm-cblas-wrap: test-sgemm-cblas.c $(TOPDIR)/libopenblas.so libopenblas_wrap.so
-	gcc $(CFLAGS) -o test-sgemm-cblas-wrap test-sgemm-cblas.c -L. -lopenblas_wrap
+	$(CC) $(CFLAGS) -o test-sgemm-cblas-wrap test-sgemm-cblas.c $(FEXTRALIB) -L. -lopenblas_wrap
 
 
 

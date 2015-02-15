@@ -5,7 +5,7 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_wrap.so
 
-test: test-sgemm-wrap test-sgemm test-sgemm-cblas test-sgemm-cblas-wrap
+test: test-sgemm-wrap test-sgemm test-sgemm-cblas test-sgemm-cblas-wrap test-dgemm-wrap
 
 install:
 	 install libopenblas*.so ../lib
@@ -30,6 +30,8 @@ test-sgemm-cblas-wrap: test-sgemm-cblas.c $(TOPDIR)/libopenblas.so libopenblas_w
 	$(CC) $(CFLAGS) -o test-sgemm-cblas-wrap test-sgemm-cblas.c $(FEXTRALIB) -L. -lopenblas_wrap
 
 
+test-dgemm-wrap: test-dgemm.c $(TOPDIR)/libopenblas.so libopenblas_wrap.so
+	$(CC) $(CFLAGS) -o test-dgemm-wrap test-dgemm.c $(FEXTRALIB) -L. -lopenblas_wrap
 
 
 
@@ -38,5 +40,6 @@ clean:
 	rm -f *.so
 	rm -f test-sgemm
 	rm -f test-sgemm-wrap
+	rm -f test-dgemm-wrap
 	rm -f test-sgemm-cblas
 	rm -f test-sgemm-cblas-wrap

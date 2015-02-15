@@ -135,7 +135,19 @@ void dgemm_(char *TRANSA, char *TRANSB, blasint *M, blasint *N, blasint *K, doub
 	}
 	if ( blas_gpu_info && use_gpu)
 	{
-		dgemm_gpu = (blas_gpu_info)(3, "dgemm" , M, N, K);
+
+		p=getenv("OPENBLAS_PRECISION");
+		if ( p != NULL )
+		{
+			if ( !strncasecmp(p,"mixed", 8) )
+				dgemm_gpu = (blas_gpu_info)(3, "dsgemm" , M, N, K);
+			else
+				dgemm_gpu = (blas_gpu_info)(3, "dgemm" , M, N, K);
+				
+		}
+		else
+			dgemm_gpu = (blas_gpu_info)(3, "dgemm" , M, N, K);
+
         	if ( dgemm_gpu )
         	{
 			#ifdef DEBUG

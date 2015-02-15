@@ -25,7 +25,7 @@ int main (int argc, char *argv[])
 	int n=8189;
 	int k=8189;	
 
-	char transa='C';
+	char transa='N';
 	char transb='C';
 
 	if ( transa == 'N' )

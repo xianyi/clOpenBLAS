@@ -32,7 +32,7 @@ if [ -z "$OPENBLAS_GPU_LIB" ]; then
 fi
 
 # optional: export a path to the icd files
-# export OPENCL_VENDOR_PATH=/home/saar/OpenCL/vendors
+# export OPENCL_VENDOR_PATH=$HOME/OpenCL/vendors
 
 
 # optional: set a search string for a device
@@ -52,6 +52,10 @@ fi
 # optional: mask available AMD devices
 # export GPU_DEVICE_ORDINAL=0
 # export GPU_DEVICE_ORDINAL=0,1
+
+# optional: use mixed precision for dgemm on the gpu
+# if you don't need high accuracy
+# export OPENBLAS_PRECISION=mixed
 
 # optional: set Minimum sizes for gemm functions or disable the function by setting -1
 export SGEMM_GPU_MINSIZE=2048

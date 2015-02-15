@@ -21,9 +21,9 @@ int main (int argc, char *argv[])
 
 	int lda,ldb;
 
-	int m=2048*2;	
+	int m=2048*4;	
 	int n=2048*4;
-	int k=2048*2;	
+	int k=2048*4;	
 
 	char transa='N';
 	char transb='T';
@@ -105,13 +105,13 @@ int main (int argc, char *argv[])
 	start=(double) tv.tv_sec+(double)tv.tv_usec*1.e-6;
 
 	int ret=0;
-	int (*dgemm_gpu)();
+	int (*dsgemm_gpu)();
 
 
-	dgemm_gpu = blas_gpu_info(3, "dgemm", NULL, NULL, NULL);
-	if ( dgemm_gpu )
+	dsgemm_gpu = blas_gpu_info(3, "dsgemm", NULL, NULL, NULL);
+	if ( dsgemm_gpu )
 	{
-		ret = dgemm_gpu(&transa,&transb,&m,&n,&k,&alpha,a,&lda,b,&ldb,&beta,cg,&ldc);
+		ret = dsgemm_gpu(&transa,&transb,&m,&n,&k,&alpha,a,&lda,b,&ldb,&beta,cg,&ldc);
 	}
 	else
 	{
@@ -143,7 +143,7 @@ int main (int argc, char *argv[])
 	for(i=0; i<m*n; i++)
 	{
 		error = fabs((cc[i] - cg[i]));
-		if ( error > 0.1e-13 )
+		if ( error > 0.1e-5 )
 			printf("ERROR: %ld:%.16f	%.16f	%.16f\n",i,error, cg[i],cc[i]);
 	}
 

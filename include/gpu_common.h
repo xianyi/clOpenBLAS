@@ -65,4 +65,11 @@ static int  zgemm_gpu_kernel(struct gpu_context *gpu_ptr, int M, int N, int K, d
 #endif
 
 
+#if defined(HAVE_DSGEMM)
 
+static void dsgemm_gpu_ccopy(int M, int N, float *A, int LDA, double *B, blasint LDB, double alpha, double beta) __attribute__ ((noinline));
+static void dsgemm_gpu_acopy(int M, int N, double *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void dsgemm_gpu_btcopy(int M, int N, double *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+static void dsgemm_gpu_bcopy(int M, int N, double *A , blasint LDA, float *B, int PAD_M, int PAD_N) __attribute__ ((noinline));
+
+#endif

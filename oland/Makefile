@@ -5,7 +5,7 @@ include $(TOPDIR)/Makefile.system
 
 All: libopenblas_oland.so
 
-test: test-sgemm-oland test-dgemm-oland test-cgemm-oland test-zgemm-oland
+test: test-sgemm-oland test-dgemm-oland test-cgemm-oland test-zgemm-oland test-dsgemm-oland
 
 install:
 	install libopenblas*.so ../lib
@@ -13,7 +13,7 @@ install:
 
 
 
-oland.o: oland.c oland.h ../include/gpu_common.h ../gpu_common/sgemm.c ../gpu_common/gemm_common.c ../gpu_common/dgemm.c ../gpu_common/cgemm.c ../gpu_common/zgemm.c
+oland.o: oland.c oland.h ../include/gpu_common.h ../gpu_common/sgemm.c ../gpu_common/gemm_common.c ../gpu_common/dgemm.c ../gpu_common/cgemm.c ../gpu_common/zgemm.c ../gpu_common/dsgemm.c
 	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o oland.o oland.c
 
 
@@ -36,6 +36,10 @@ test-zgemm-oland: test-zgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so lib
 	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-oland test-zgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
 
 
+test-dsgemm-oland: test-dsgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
+	$(CC) $(CFLAGS) -fopenmp -o test-dsgemm-oland test-dsgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+
+
 
 
 
@@ -44,6 +48,7 @@ clean:
 	rm -f *.so
 	rm -f test-sgemm-*
 	rm -f test-dgemm-*
+	rm -f test-dsgemm-*
 	rm -f test-cgemm-*
 	rm -f test-zgemm-*
 

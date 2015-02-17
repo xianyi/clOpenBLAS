@@ -10,8 +10,14 @@
 #define DGEMM_N_MAX (1024*2)
 #define DGEMM_K_MAX (1024*4)
 
+#define CGEMM_M_MAX (1024*2)
+#define CGEMM_N_MAX (1024*2)
+#define CGEMM_K_MAX (1024*4)
+
+
 #define SGEMM_N_BUFFERS 16
 #define DGEMM_N_BUFFERS 16
+#define CGEMM_N_BUFFERS 16
 
 #define GALLOC_SIZE_A ( SGEMM_M_MAX * SGEMM_K_MAX * sizeof(float) )
 #define GALLOC_SIZE_B ( SGEMM_N_MAX * SGEMM_K_MAX * sizeof(float) )
@@ -51,6 +57,18 @@
 #define DGEMM_PAD_M 128
 #define DGEMM_PAD_N 64
 #define DGEMM_PAD_K 16
+
+
+#define CGEMM_GLOBAL0_DIV 8
+#define CGEMM_GLOBAL1_DIV 4
+
+#define CGEMM_LOCAL0 16
+#define CGEMM_LOCAL1 16
+
+#define CGEMM_PAD_M 128
+#define CGEMM_PAD_N 64
+#define CGEMM_PAD_K 16
+
 
 
 static char  *DEFAULT_KERNEL = "geforce_7xx";

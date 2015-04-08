@@ -1,0 +1,10 @@
+CC := gcc
+
+OPENCL_ROOT := /opt/AMDAPPSDK-2.9-1
+
+OPENCL_LIB_DIR := ${OPENCL_ROOT}/lib/x86_64
+
+CPU_BLAS := /opt/OpenBLAS/libopenblas.a
+
+GPU_PFLAGS := 
+#-DPROFILE -DDEBUG

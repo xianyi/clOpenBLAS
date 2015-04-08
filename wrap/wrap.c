@@ -1,5 +1,5 @@
 /***************************************************************************
-Copyright (c) 2013, The OpenBLAS Project
+Copyright (c) 2015, The OpenBLAS Project
 All rights reserved.
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -25,7 +25,6 @@ OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
 USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *****************************************************************************/
 
-
 #define _GNU_SOURCE 1
 #include <stdlib.h>
 #include <stdio.h>
@@ -35,7 +34,7 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <ctype.h>
 #include <dlfcn.h>
 
-#include <common.h>
+#include <clopenblas_common.h>
 /*
 static void * handle = NULL;
 static void * ohandle = NULL;

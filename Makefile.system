@@ -1,0 +1,24 @@
+include ${TOPDIR}/Makefile.rule
+
+OPENCL_INCLUDE := ${OPENCL_ROOT}/include
+
+
+PROJECT_NAME := clopenblas
+LIBPREFIX := lib${PROJECT_NAME}
+DEVICE_NAME := $(notdir $(CURDIR))
+LIBNAME := ${LIBPREFIX}_${DEVICE_NAME}.so
+
+
+CFLAGS += -I${OPENCL_INCLUDE} -fopenmp -fPIC
+LDFLAGS += -fopenmp -fPIC 
+
+GENLIB_FLAGS := ${LDFLAGS} -shared
+
+CLOPENBLAS_EXTRALIB += -L${OPENCL_LIB_DIR} -lOpenCL
+
+CLOPENBLAS_TESTLIB := -L. -l${PROJECT_NAME}_${DEVICE_NAME} ${CPU_BLAS} -Wl,-rpath=${CURDIR}
+
+#for wrap folder
+CLOPENBLAS_WRAPLIB := -L. -l${PROJECT_NAME}_${DEVICE_NAME} -Wl,-rpath=${CURDIR} -ldl -lpthread
+
+FEXTRALIB := -lgfortran

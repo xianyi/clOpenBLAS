@@ -1,45 +1,43 @@
-TOPDIR  = ../..
+TOPDIR  = ..
 include $(TOPDIR)/Makefile.system
 
 # GPU_PFLAGS=-DPROFILE -DDEBUG
 
-All: libopenblas_oland.so
 
-test: test-sgemm-oland test-dgemm-oland test-cgemm-oland test-zgemm-oland test-dsgemm-oland
+All: ${LIBNAME}
+
+test: test-sgemm-${DEVICE_NAME} test-dgemm-${DEVICE_NAME} test-cgemm-${DEVICE_NAME} test-zgemm-${DEVICE_NAME} test-dsgemm-${DEVICE_NAME}
 
 install:
-	install libopenblas*.so ../lib
+	install ${LIBNAME} ../lib
 	install *.cl ../libcl
 
 
 
-oland.o: oland.c oland.h ../include/gpu_common.h ../gpu_common/sgemm.c ../gpu_common/gemm_common.c ../gpu_common/dgemm.c ../gpu_common/cgemm.c ../gpu_common/zgemm.c ../gpu_common/dsgemm.c
-	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o oland.o oland.c
+${DEVICE_NAME}.o: ${DEVICE_NAME}.c ${DEVICE_NAME}.h ../include/gpu_common.h ../gpu_common/sgemm.c ../gpu_common/gemm_common.c ../gpu_common/dgemm.c ../gpu_common/cgemm.c ../gpu_common/zgemm.c ../gpu_common/dsgemm.c
+	$(CC) $(CFLAGS) -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o $@ $<
 
 
-libopenblas_oland.so: oland.o 
-	$(CC) -fopenmp -shared -fPIC -o libopenblas_oland.so oland.o $(OPENCL_LIB_DIR) -lOpenCL
+${LIBNAME}: ${DEVICE_NAME}.o 
+	$(CC) ${GENLIB_FLAGS} -o $@ $^ ${CLOPENBLAS_EXTRALIB}
 
-test-sgemm-oland: test-sgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-oland test-sgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
-
-
-test-dgemm-oland: test-dgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-oland test-dgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+test-sgemm-${DEVICE_NAME}: test-sgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-${DEVICE_NAME} test-sgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB) 
 
 
-test-cgemm-oland: test-cgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-oland test-cgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+test-dgemm-${DEVICE_NAME}: test-dgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-${DEVICE_NAME} test-dgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
 
-test-zgemm-oland: test-zgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-oland test-zgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+test-cgemm-${DEVICE_NAME}: test-cgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-${DEVICE_NAME} test-cgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
 
-test-dsgemm-oland: test-dsgemm.c libopenblas_oland.so $(TOPDIR)/libopenblas.so libopenblas_oland.so
-	$(CC) $(CFLAGS) -fopenmp -o test-dsgemm-oland test-dsgemm.c $(FEXTRALIB) -L. -lopenblas_oland -L$(TOPDIR) -lopenblas
+test-zgemm-${DEVICE_NAME}: test-zgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-${DEVICE_NAME} test-zgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
-
+test-dsgemm-${DEVICE_NAME}: test-dsgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-dsgemm-${DEVICE_NAME} test-dsgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
 
 
@@ -51,4 +49,6 @@ clean:
 	rm -f test-dsgemm-*
 	rm -f test-cgemm-*
 	rm -f test-zgemm-*
+	rm -f test-dsgemm-*
+
 

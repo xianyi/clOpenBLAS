@@ -1,39 +1,43 @@
-TOPDIR  = ../..
+TOPDIR  = ..
 include $(TOPDIR)/Makefile.system
 
 # GPU_PFLAGS=-DPROFILE -DDEBUG
 
-All: libopenblas_geforce_7xx.so
 
-test: test-sgemm-geforce_7xx test-dgemm-geforce_7xx test-dsgemm-geforce_7xx test-cgemm-geforce_7xx
+All: ${LIBNAME}
+
+test: test-sgemm-${DEVICE_NAME} test-dgemm-${DEVICE_NAME} test-cgemm-${DEVICE_NAME} test-dsgemm-${DEVICE_NAME}
 
 install:
-	install libopenblas*.so ../lib
+	install ${LIBNAME} ../lib
 	install *.cl ../libcl
 
 
 
-geforce_7xx.o: geforce_7xx.c geforce_7xx.h ../include/gpu_common.h ../gpu_common/sgemm.c ../gpu_common/gemm_common.c ../gpu_common/dgemm.c ../gpu_common/dsgemm.c ../gpu_common/cgemm.c
-	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o geforce_7xx.o geforce_7xx.c
+${DEVICE_NAME}.o: ${DEVICE_NAME}.c ${DEVICE_NAME}.h ../include/gpu_common.h ../gpu_common/sgemm.c ../gpu_common/gemm_common.c ../gpu_common/dgemm.c ../gpu_common/cgemm.c ../gpu_common/zgemm.c ../gpu_common/dsgemm.c
+	$(CC) $(CFLAGS) -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o $@ $<
 
 
-libopenblas_geforce_7xx.so: geforce_7xx.o 
-	$(CC)  -fopenmp -shared -fPIC -o libopenblas_geforce_7xx.so geforce_7xx.o $(OPENCL_LIB_DIR) -lOpenCL
+${LIBNAME}: ${DEVICE_NAME}.o 
+	$(CC) ${GENLIB_FLAGS} -o $@ $^ ${CLOPENBLAS_EXTRALIB}
 
-test-sgemm-geforce_7xx: test-sgemm.c libopenblas_geforce_7xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_7xx.so
-	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-geforce_7xx test-sgemm.c $(FEXTRALIB)  -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas -lOpenCL
-
-test-dgemm-geforce_7xx: test-dgemm.c libopenblas_geforce_7xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_7xx.so
-	$(CC) $(CFLAGS)  -fopenmp -o test-dgemm-geforce_7xx test-dgemm.c $(FEXTRALIB)  -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
-
-test-dsgemm-geforce_7xx: test-dsgemm.c libopenblas_geforce_7xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_7xx.so
-	$(CC) $(CFLAGS)  -fopenmp -o test-dsgemm-geforce_7xx test-dsgemm.c $(FEXTRALIB)  -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
+test-sgemm-${DEVICE_NAME}: test-sgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-${DEVICE_NAME} test-sgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB) 
 
 
-test-cgemm-geforce_7xx: test-cgemm.c libopenblas_geforce_7xx.so $(TOPDIR)/libopenblas.so libopenblas_geforce_7xx.so
-	$(CC) $(CFLAGS)  -fopenmp -o test-cgemm-geforce_7xx test-cgemm.c $(FEXTRALIB)  -L. -lopenblas_geforce_7xx -L$(TOPDIR) -lopenblas
+test-dgemm-${DEVICE_NAME}: test-dgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-${DEVICE_NAME} test-dgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
 
+test-cgemm-${DEVICE_NAME}: test-cgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-${DEVICE_NAME} test-cgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
+
+
+test-zgemm-${DEVICE_NAME}: test-zgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-${DEVICE_NAME} test-zgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
+
+test-dsgemm-${DEVICE_NAME}: test-dsgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-dsgemm-${DEVICE_NAME} test-dsgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
 
 
@@ -41,7 +45,10 @@ clean:
 	rm -f *.o
 	rm -f *.so
 	rm -f test-sgemm-*
-	rm -f test-cgemm-*
 	rm -f test-dgemm-*
 	rm -f test-dsgemm-*
+	rm -f test-cgemm-*
+	rm -f test-zgemm-*
+	rm -f test-dsgemm-*
+
 

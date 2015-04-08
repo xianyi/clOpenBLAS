@@ -31,7 +31,7 @@ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <time.h>
 #include <string.h>
 
-#include <common.h>
+#include <clopenblas_common.h>
 
 void * blas_gpu_info(int level, char *bfunc, blasint *m, blasint *n, blasint *k)
 {

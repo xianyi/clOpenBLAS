@@ -1,42 +1,43 @@
-TOPDIR  = ../..
+TOPDIR  = ..
 include $(TOPDIR)/Makefile.system
 
 # GPU_PFLAGS=-DPROFILE -DDEBUG
 
-All: libopenblas_spectre.so
 
-test: test-sgemm-spectre test-dgemm-spectre test-cgemm-spectre test-zgemm-spectre test-dsgemm-spectre
+All: ${LIBNAME}
+
+test: test-sgemm-${DEVICE_NAME} test-dgemm-${DEVICE_NAME} test-cgemm-${DEVICE_NAME} test-zgemm-${DEVICE_NAME} test-dsgemm-${DEVICE_NAME}
 
 install:
-	install libopenblas*.so ../lib
+	install ${LIBNAME} ../lib
 	install *.cl ../libcl
 
 
 
-spectre.o: spectre.c spectre.h ../include/gpu_common.h ../gpu_common/sgemm.c ../gpu_common/gemm_common.c ../gpu_common/dgemm.c ../gpu_common/cgemm.c ../gpu_common/zgemm.c ../gpu_common/dsgemm.c
-	$(CC) $(CFLAGS) -fopenmp -fPIC -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o spectre.o spectre.c
+${DEVICE_NAME}.o: ${DEVICE_NAME}.c ${DEVICE_NAME}.h ../include/gpu_common.h ../gpu_common/sgemm.c ../gpu_common/gemm_common.c ../gpu_common/dgemm.c ../gpu_common/cgemm.c ../gpu_common/zgemm.c ../gpu_common/dsgemm.c
+	$(CC) $(CFLAGS) -c $(GPU_PFLAGS) -I../include -I$(TOPDIR)   -o $@ $<
 
 
-libopenblas_spectre.so: spectre.o 
-	$(CC) -fopenmp -shared -fPIC -o libopenblas_spectre.so spectre.o $(OPENCL_LIB_DIR) -lOpenCL
+${LIBNAME}: ${DEVICE_NAME}.o 
+	$(CC) ${GENLIB_FLAGS} -o $@ $^ ${CLOPENBLAS_EXTRALIB}
 
-test-sgemm-spectre: test-sgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-spectre test-sgemm.c $(FEXTRALIB) -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
-
-
-test-dgemm-spectre: test-dgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-spectre test-dgemm.c $(FEXTRALIB) -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+test-sgemm-${DEVICE_NAME}: test-sgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-sgemm-${DEVICE_NAME} test-sgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB) 
 
 
-test-cgemm-spectre: test-cgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-spectre test-cgemm.c $(FEXTRALIB)  -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+test-dgemm-${DEVICE_NAME}: test-dgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-dgemm-${DEVICE_NAME} test-dgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
 
-test-zgemm-spectre: test-zgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-spectre test-zgemm.c $(FEXTRALIB)  -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+test-cgemm-${DEVICE_NAME}: test-cgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-cgemm-${DEVICE_NAME} test-cgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
-test-dsgemm-spectre: test-dsgemm.c libopenblas_spectre.so $(TOPDIR)/libopenblas.so libopenblas_spectre.so
-	$(CC) $(CFLAGS) -fopenmp -o test-dsgemm-spectre test-dsgemm.c $(FEXTRALIB)  -L. -lopenblas_spectre -L$(TOPDIR) -lopenblas
+
+test-zgemm-${DEVICE_NAME}: test-zgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-zgemm-${DEVICE_NAME} test-zgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
+
+test-dsgemm-${DEVICE_NAME}: test-dsgemm.c ${LIBNAME}
+	$(CC) $(CFLAGS) -fopenmp -o test-dsgemm-${DEVICE_NAME} test-dsgemm.c ${CLOPENBLAS_TESTLIB} $(FEXTRALIB)
 
 
 
@@ -47,6 +48,7 @@ clean:
 	rm -f test-dgemm-*
 	rm -f test-dsgemm-*
 	rm -f test-cgemm-*
+	rm -f test-zgemm-*
 	rm -f test-dsgemm-*
 
 

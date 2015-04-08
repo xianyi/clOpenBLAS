@@ -1,4 +1,4 @@
-TOPDIR  = ..
+TOPDIR  = .
 include $(TOPDIR)/Makefile.system
 MAKE1 = make
 
@@ -18,6 +18,8 @@ test:
         done
 
 install:
+	-mkdir -p lib/
+	-mkdir -p libcl/
 	for d in $(OCLDIRS) ; \
         do if test -d $$d; then \
           $(MAKE1) -C $$d install ; \
